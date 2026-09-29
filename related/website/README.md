@@ -1,10 +1,6 @@
 # Lumiq Studio 网站
 
-## 当前审阅版 · 2026-09-07
-
-最新整站审阅入口为仓库根目录 `output/交付/客户审阅版-2026-09-07/交付说明.md`；问题清单在同目录 `走查与待办.md`。预览端口4211使用已构建版本。全站共用 `app/site-typography.css`；首两屏当前使用 `opening-position-h3-20260907.mp4`。后文中的旧分支和旧预览为历史记录，后续按根目录最新接力说明继续。
-
-这是 Lumiq Studio 官网源码，现内置于协作仓库的 `related/website/`。2026-09-06 首页改版位于本地分支 `codex/homepage-client-ready-2026-09-06`，已保存基线 `cfe7870`，随后统一了全站导航；未推送或发布，不得直接发布生产环境或合并 `main`。七层结构与客户仓库差异见根目录的 `output/交付/首页代码优化-2026-09-06/首页优化与交付检查.md`；最新导航验收见 `output/playwright/navigation-2026-09-06/验收.md`。
+当前部署说明以仓库根目录 README.md 为准。生产项目 lumiqwebsite，Root Directory 为 related/website，Git LFS 必须启用。
 
 ## 本地开发与检查
 
@@ -87,10 +83,8 @@ tests/                单元测试和页面流程测试
 messages/             多语言文案
 ```
 
-## Vercel 预览部署
+## Vercel 部署
 
-```bash
-npx vercel
-```
+推送 main 自动部署生产；其他分支可用于预览。若没有可重新部署的记录，在 Deployments 菜单选择 Create Deployment 并选择分支。
 
-上面的命令仅作后续说明，本轮未部署。先确认使用客户仓库还是开发仓库，以及 Vercel 项目的 Root Directory；本协作仓库的代码根目录是 `related/website/`。获准部署时只选择 Preview 环境。部署前先应用数据库迁移并配置 Supabase 私密变量；验收预览地址后仍不得运行生产部署，也不得合并 `main`。
+历史设计资料已移至 Git 历史。图片再生成脚本可能依赖这些历史母版；正常 npm run build 不依赖历史目录。

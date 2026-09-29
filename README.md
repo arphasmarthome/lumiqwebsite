@@ -1,14 +1,38 @@
-# LumiQ 官网交接
+# LumiQ 官网
 
-当前正式开发入口：**`main` 分支的 `related/website/`**。交接版本：`handoff-2026-09-07`。
+正式网站代码位于 `related/website/`，生产分支为 `main`。
 
-- [交接说明与待办](output/交付/GitHub交接-2026-09-07/交接说明.md)
-- [正式素材索引](output/交付/GitHub交接-2026-09-07/素材索引.md)
-- [本地恢复与运行](迁移与协作.md)
-- 正式网站：https://lumiq-home-pearl-preview.vercel.app
+- Vercel 项目：`lumiqwebsite`
+- Project ID：`prj_kojNA8sErpfLjpXGo1jfimbVUSCF`
+- 生产地址：https://lumiqwebsite.vercel.app/en
+- Framework：Next.js
+- Root Directory：`related/website`
+- Git LFS：必须启用；更改后需要创建新部署。
+- 构建及输出目录：使用 Next.js 默认设置，不覆盖。
 
-此版本包括首页连续视频与加载蒙版、楼层停靠、内页一致性调整、Print同款书素材，以及手机高清首屏和无滚动条产品区。
+## 本地运行
 
-**待客户接续：候补名单的生产存储尚未配置，当前不能真实保存报名邮箱；媒体引用、联系资料及商业政策仍需确认。**
+```sh
+git lfs install
+git clone https://github.com/arphasmarthome/lumiqwebsite.git
+cd lumiqwebsite
+git lfs pull
+cd related/website
+npm ci
+npm run build
+npm start
+```
 
-网站代码已内置，可以直接修改。9月3日静态稿和旧视频仅用于历史参考，不能覆盖当前成品。旧进度说明已移到交接目录的 `历史说明/`，其中“未上传”等语句只代表当时状态。
+检查命令：`npm test`、`npm run typecheck`、`npm run lint`、`npm run check:i18n`。
+
+## 部署
+
+推送 `main` 会触发生产构建。如果项目没有现存部署，使用 Vercel 的 Deployments → ⋯ → Create Deployment → main；不要使用 Redeploy。
+
+## 2026-09-29 部署清理
+
+已从当前分支移除网站目录之外的历史生成文件、设计试稿、原始素材、浏览器截图、旧提案项目、聊天导出和打包工具。所有网站源代码、运行资源、测试和数据库迁移均保留。
+
+这些历史资料仍可从清理前的提交 `af6637fb62fa62c9a5082612d3e625d5342112ae` 恢复，未重写或清除 Git 历史。旧进度记录中的历史路径可在该提交查看。
+
+候补名单生产存储仍需配置：参考 `related/website/.env.example` 和 Supabase 数据库迁移。未配置真实存储时，不能声称报名邮箱已保存。不得提交账号、令牌或真实环境变量。
