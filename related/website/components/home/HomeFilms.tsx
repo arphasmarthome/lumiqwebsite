@@ -121,7 +121,7 @@ export default function HomeFilms() {
             tabIndex={Math.abs(slot) > 1 || travel !== 0 ? -1 : 0} disabled={travel !== 0}
             type="button" onClick={() => select(Math.sign(offset))} aria-label={`${t(offset < 0 ? "previous" : "next")}: ${t(`${films[index]}.title`)}`}>
             <Image src={`/assets/films-20260908/${films[index]}.jpg`} alt="" width={1280} height={720} unoptimized />
-          </button> : <article className="lh-film-card" aria-label={`${active + 1} / ${films.length}`} data-playing={playing}>
+          </button> : <article className={`lh-film-card${films[active] === "welcome-home" ? " lh-film-card-portrait" : ""}`} aria-label={`${active + 1} / ${films.length}`} data-playing={playing}>
           <video ref={video} playsInline preload="none" poster={`/assets/films-20260908/${films[active]}.jpg`}
             aria-label={t(`${films[active]}.title`)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)}>
             <source src={`/assets/films-20260908/${films[active]}.mp4`} type="video/mp4" />
