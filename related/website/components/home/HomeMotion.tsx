@@ -8,6 +8,7 @@ import { mountRoomAnchor } from "./roomAnchor";
 import { mountOpeningVideo, openingVideoQuery } from "./openingVideo";
 import { preloadScenes } from "./preloadScenes";
 import { mountReadingAnchors } from "./readingNavigation";
+import { mountHomePosition } from "./homePosition";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 /** Native scrolling drives the current opening at every desktop aspect ratio. */
@@ -20,6 +21,7 @@ export default function HomeMotion({ children }: { children: ReactNode }) {
     () => {
       const fontsChanged = () => ScrollTrigger.refresh();
       document.fonts.addEventListener("loadingdone", fontsChanged);
+      const releasePosition = root.current ? mountHomePosition(root.current) : () => {};
       const releaseImages = root.current ? preloadScenes(root.current) : () => {};
       const releaseOpening = root.current
         ? mountOpeningVideo(root.current)
@@ -108,18 +110,8 @@ export default function HomeMotion({ children }: { children: ReactNode }) {
           return () => cleanups.forEach((cleanup) => cleanup());
         },
       );
-      // Native hash positioning runs before the pinned floors reserve their
-      // scroll distance. Re-align deep links while the loading veil is present.
-      const anchorFrame = requestAnimationFrame(() => {
-        const target = document.getElementById(window.location.hash.slice(1));
-        if (!target || !root.current?.contains(target) || target === root.current || target.closest('.lh-opening')) return;
-        ScrollTrigger.refresh();
-        const nav = document.querySelector('.site-nav')?.getBoundingClientRect().height ?? 86;
-        window.scrollTo({ top: scrollY + target.getBoundingClientRect().top - nav, behavior: 'instant' });
-        ScrollTrigger.update();
-      });
       return () => {
-        cancelAnimationFrame(anchorFrame);
+        releasePosition();
         document.fonts.removeEventListener("loadingdone", fontsChanged);
         releaseImages();
         releaseReading();
