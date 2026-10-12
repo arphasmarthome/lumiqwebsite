@@ -2,11 +2,14 @@ name: Browser and operating system audit
 on:
   workflow_dispatch:
   push:
-    branches: [main, codex/release-20261012]
+    branches: [main]
   pull_request:
     branches: [main]
 permissions:
   contents: read
+concurrency:
+  group: browser-audit-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   audit:
     strategy:
