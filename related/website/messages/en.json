@@ -1,4 +1,15 @@
 {
+  "Members": {
+    "nav": "Members", "title": "A little closer, every day.", "intro": "Keep your devices, preferences and creations together in one calm place.",
+    "preview": "Frontend preview", "previewNotice": "Design and function preview. Sign-in, orders and device services are not connected. Data stays in this browser and is never synced or submitted.",
+    "visitor": "Guest", "localOnly": "This browser only", "devices": "My devices", "profile": "Personal settings", "membership": "Membership", "portfolio": "Your creations", "feedback": "Suggestions & complaints", "help": "Need a hand?",
+    "noDevices": "No connected devices yet", "noDevicesBody": "Purchased devices will appear after sign-in when the service launches. Explore a demo to try the settings.", "showDemo": "Explore demo devices", "demoDevice": "Demo device", "notConnected": "No real device connected", "demoNotice": "Demo devices are not purchase records. These settings do not change a real device.",
+    "settings": "Settings for", "deviceSettings": "Device settings", "deviceName": "Device name", "quiet": "Quiet at night (demo)", "deviceNotice": "Names and switches stay in this browser. Real controls require the device service.", "saveSettings": "Save settings", "close": "Cancel", "saved": "Settings saved in this browser.", "storageError": "Your browser could not save this. Allow local storage and try again.", "explore": "Explore other LUMIQ products",
+    "displayName": "Display name", "displayNamePlaceholder": "What would you like to be called?", "notifications": "Receive product updates (demo)", "profileNotice": "This does not create an account or send notifications. Sign-in and notification services are not connected.",
+    "notActivated": "Not activated", "planTitle": "Find your way to stay connected", "planBody": "Membership, device benefits and renewal details will appear when the service is connected. Explore the current plan information without starting a subscription or payment.", "viewPlans": "Explore plans", "noPayment": "Purchasing and payment are not included in this preview.",
+    "chooseCover": "Choose a cover", "coverPreview": "Local cover preview", "workTitle": "Creation title", "workNotice": "The cover is previewed on this page only and is not uploaded. Save the title as a local draft; select the cover again after refreshing. Publication requires sign-in and review services.", "workSaved": "Title saved as a local draft. Nothing was submitted.", "fileError": "Choose a PNG, JPEG or WebP image smaller than 10 MB.",
+    "feedbackType": "Type", "suggestion": "Suggestion", "complaint": "Complaint", "content": "Message", "feedbackNotice": "Do not include passwords, payment details or sensitive information. This saves a draft only, without sending it to support.", "saveDraft": "Save draft", "draftSaved": "Draft saved in this browser. Not sent to support.", "contact": "Contact us"
+  },
   "HomeRefresh": {
     "loading": {
       "label": "Preparing your experience",
@@ -604,6 +615,11 @@
     "conceptNotice": "Concept specifications — final features, 4G availability, location, collision detection and SOS are pending brand confirmation.",
     "relationshipEyebrow": "Made with Lumiq Ola",
     "relationshipTitle": "At home with Ola. Along the way with Ola Go.",
+    "scenesTitle": "Everyday essentials, close at hand.",
+    "connectedTitle": "Stay connected along the way.",
+    "connectedIntro": "Explore Ola Go's connectivity and safety concepts. Final functions and service coverage await brand confirmation.",
+    "closingTitle": "Meet your pocket companion.",
+    "closingBody": "Ola Go is planned to be included with LUMIQ OLA. Join the waitlist for product availability updates.",
     "relationshipBody": "Ola Go is currently planned as an included companion rather than a separately sold product.",
     "remindersTitle": "Portable reminders",
     "remindersBody": "A proposed gentle way to carry daily prompts away from home.",

@@ -1,3 +1,4 @@
+import Heading from "@/components/Heading";
 import Image from "@/components/home/HomeImage";
 import { getTranslations, getLocale } from "next-intl/server";
 import {
@@ -31,14 +32,6 @@ import "./home-pearl-background.css";
 import "./home-brand-review.css";
 
 const collection: ProductId[] = ["tablet", "ola", "ola-go", "nest", "print"];
-// Five masks reveal the existing rendered letters, not a browser font.
-const glassSlices = [
-  [0, 20],
-  [20, 42],
-  [42, 69.5],
-  [69.5, 77.5],
-  [77.5, 100],
-];
 const artwork: Record<ProductId, string> = {
   tablet: "home-products-refined-20260907/tablet-pair",
   ola: "home-products-refined-20260907/ola-original-transparent",
@@ -92,38 +85,18 @@ export default async function Home() {
                 priority
               />
             </div>
-            <div className="lh-glass-word" aria-hidden="true">
-              <div className="lh-glass-art">
-                {glassSlices.map(([left, right], index) => (
-                  <span
-                    className="lh-glass-glyph"
-                    key={index}
-                    style={{ clipPath: `inset(0 ${100 - right}% 0 ${left}%)` }}
-                  >
-                    <Image
-                      src="/assets/home-interactive/glass-wordmark-original.webp"
-                      alt=""
-                      fill
-                      sizes="(max-width: 1692px) 91vw, 1540px"
-                      unoptimized
-                      priority
-                    />
-                  </span>
-                ))}
-              </div>
-            </div>
             <div className="lh-wrap lh-hero-layout">
               <div className="lh-hero-copy">
                 <p className="lh-eyebrow">
                   <span className="lh-dot" /> LUMIQ STUDIO
                 </p>
-                <h1 id="hero-title">
+                <Heading as="h1" id="hero-title">
                   {t("hero1")}
                   <br />
                   {t("hero2")}
                   <br />
                   <span className="lh-hero-accent">{t("hero3")}</span>
-                </h1>
+                </Heading>
                 <p className="lh-lead">{t("heroBody")}</p>
                 <div className="lh-actions">
                   <a href="#products" className="lh-button">
@@ -134,49 +107,6 @@ export default async function Home() {
                     {t("ourStory")}
                     <ArrowUpRight size={18} />
                   </Link>
-                </div>
-              </div>
-              <div
-                className="lh-hero-stage"
-                aria-label={t("heroAlt")}
-                role="img"
-              >
-                <div className="lh-hero-plinth" aria-hidden="true" />
-                <div className="lh-hero-object lh-hero-nest">
-                  <Image
-                    src="/assets/home-interactive/nest15-confirmed.webp"
-                    alt=""
-                    fill
-                    sizes="(max-width: 767px) 36vw, 350px"
-                    priority
-                  />
-                </div>
-                <div className="lh-hero-object lh-hero-ola">
-                  <Image
-                    src="/assets/home-interactive/ola.webp"
-                    alt=""
-                    fill
-                    sizes="(max-width: 767px) 40vw, 430px"
-                    priority
-                  />
-                </div>
-                <div className="lh-hero-object lh-hero-tablet">
-                  <Image
-                    src="/assets/home-interactive/tablet.webp"
-                    alt=""
-                    fill
-                    sizes="(max-width: 767px) 40vw, 410px"
-                    priority
-                  />
-                </div>
-                <div className="lh-hero-object lh-hero-go">
-                  <Image
-                    src="/assets/home-interactive/go.webp"
-                    alt=""
-                    fill
-                    sizes="150px"
-                    priority
-                  />
                 </div>
               </div>
             </div>
@@ -190,11 +120,11 @@ export default async function Home() {
             <div className="lh-wrap lh-ola-layout">
               <div className="lh-ola-copy" data-home-reveal>
                 <p className="lh-eyebrow">{t("olaKicker")}</p>
-                <h2 id="ola-title">
+                <Heading as="h2" id="ola-title">
                   {t("brandTitle")}
                   <br />
                   <span className="lh-muted">{t("brandAccent")}</span>
-                </h2>
+                </Heading>
                 <p className="lh-lead">{t("brandBody")}</p>
                 <Link prefetch={false} className="lh-text-link" href="/products/ola">
                   {t("meetOla")}
@@ -209,14 +139,6 @@ export default async function Home() {
                   height={1672}
                   sizes="(max-width: 1100px) 100vw, 1px"
                   unoptimized
-                />
-              </div>
-              <div className="lh-brand-character" aria-hidden="true">
-                <Image
-                  src="/assets/home-interactive/ola-character.webp"
-                  alt=""
-                  fill
-                  sizes="(max-width: 767px) 180px, 340px"
                 />
               </div>
               <div className="lh-rhythm-cards">
@@ -234,7 +156,7 @@ export default async function Home() {
                       />
                     </div>
                     <div className="lh-rhythm-copy">
-                      <h3>{t(`rhythms.${key}.title`)}</h3>
+                      <Heading as="h3">{t(`rhythms.${key}.title`)}</Heading>
                       <p>{t(`rhythms.${key}.body`)}</p>
                     </div>
                   </article>
@@ -252,7 +174,7 @@ export default async function Home() {
       >
         <div className="lh-products-stage">
           <div className="lh-products-heading">
-            <h2 id="products-title">{t("productsHeading")}</h2>
+            <Heading as="h2" id="products-title">{t("productsHeading")}</Heading>
           </div>
           <HomeGlassProducts products={collection.map(id => ({
             name: t(`products.${id}.name`), body: t(`products.${id}.body`),
@@ -287,7 +209,7 @@ export default async function Home() {
                       <span className="lh-product-type">
                         {t(`products.${id}.type`)}
                       </span>
-                      <h3>{t(`products.${id}.name`)}</h3>
+                      <Heading as="h3">{t(`products.${id}.name`)}</Heading>
                       <p>{t(`products.${id}.body`)}</p>
                     </div>
                     <span className="lh-product-bottom">
@@ -365,11 +287,11 @@ export default async function Home() {
             </div>
             <div className="lh-wrap lh-safety-copy">
               <p className="lh-eyebrow">{t("safetyKicker")}</p>
-              <h2 id="safety-title">
+              <Heading as="h2" id="safety-title">
                 {t("safetyTitle")}
                 <br />
                 <span className="lh-muted">{t("safetyAccent")}</span>
-              </h2>
+              </Heading>
               <p className="lh-lead">{t("safetyBody")}</p>
             </div>
             <div className="lh-wrap lh-trust-notes">
@@ -385,7 +307,7 @@ export default async function Home() {
                     <span className="lh-principle-top" aria-hidden="true">
                       <Icon size={22} strokeWidth={1.3} />
                     </span>
-                    <h3>{t(`trust.${key}.title`)}</h3>
+                    <Heading as="h3">{t(`trust.${key}.title`)}</Heading>
                     <p>
                       {t(`trust.${key}.body`)}
                       <span className="lh-principle-sheen" aria-hidden="true">
@@ -415,11 +337,11 @@ export default async function Home() {
             <div className="lh-wrap lh-family-heading">
               <div>
                 <p className="lh-eyebrow">{t("familyKicker")}</p>
-                <h2 id="family-title">
+                <Heading as="h2" id="family-title">
                   {t("familyTitle")}
                   <br />
                   <span className="lh-muted">{t("familyAccent")}</span>
-                </h2>
+                </Heading>
               </div>
               <div className="lh-section-intro">
                 <p>{t("familyBody")}</p>
@@ -451,11 +373,11 @@ export default async function Home() {
         <div className="lh-wrap lh-join-layout">
           <div className="lh-join-copy" data-home-reveal>
             <p className="lh-eyebrow">{t("joinKicker")}</p>
-            <h2 id="join-title">
+            <Heading as="h2" id="join-title">
               {t("joinTitle")}
               <br />
               <span className="lh-muted">{t("joinAccent")}</span>
-            </h2>
+            </Heading>
             <p className="lh-lead">{t("joinBody")}</p>
           </div>
           <HomeWaitlist />

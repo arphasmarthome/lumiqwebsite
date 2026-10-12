@@ -3,39 +3,33 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export function mountRoomAnchor(root: HTMLElement) {
   const room = root.querySelector<HTMLElement>(".lh-room-layout");
-  if (!room) return () => {};
+  const section = room?.closest<HTMLElement>(".lh-room-section");
+  if (!room || !section) return () => {};
   const mm = gsap.matchMedia();
   mm.add("(min-width: 1101px) and (min-height: 720px) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
     const navHeight = () => document.querySelector('.site-nav')?.getBoundingClientRect().height ?? 86;
-    const measure = () => room.style.setProperty('--room-height', `${innerHeight - navHeight()}px`);
+    const measure = () => {
+      const top = navHeight();
+      room.style.setProperty('--room-height', `${innerHeight - top}px`);
+      room.style.setProperty('--room-top', `${top}px`);
+      section.style.setProperty('--room-stage-height', `${innerHeight - top + innerHeight * .3}px`);
+    };
     room.dataset.reading = 'true';
+    section.dataset.roomSticky = 'true';
     measure();
     ScrollTrigger.addEventListener('refreshInit', measure);
-    ScrollTrigger.create({
-      id: "home-room-anchor", trigger: room, pin: room,
-      start: () => `top ${navHeight()}`,
-      end: () => `+=${innerHeight * 0.3}`,
-      anticipatePin: 1, invalidateOnRefresh: true,
-    });
+    // Native sticky stays constrained by the section in both scroll directions.
+    // It avoids the fixed/transform hand-off that can leave a stale Safari layer.
+    window.addEventListener('resize', measure);
     return () => {
       ScrollTrigger.removeEventListener('refreshInit', measure);
+      window.removeEventListener('resize', measure);
       delete room.dataset.reading;
+      delete section.dataset.roomSticky;
       room.style.removeProperty('--room-height');
+      room.style.removeProperty('--room-top');
+      section.style.removeProperty('--room-stage-height');
     };
-  });
-  return () => mm.revert();
-}
-
-export function mountJoinAnchor(root: HTMLElement) {
-  const join = root.querySelector<HTMLElement>("#join");
-  if (!join) return () => {};
-  const mm = gsap.matchMedia();
-  mm.add("(min-width: 1101px) and (min-height: 720px) and (pointer: fine) and (prefers-reduced-motion: no-preference)", () => {
-    ScrollTrigger.create({
-      id: "home-join-anchor", trigger: join, pin: join,
-      start: () => `top ${document.querySelector('.site-nav')?.getBoundingClientRect().height ?? 86}`, end: "+=240",
-    });
-    return () => {};
   });
   return () => mm.revert();
 }

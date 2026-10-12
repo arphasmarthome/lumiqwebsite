@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import Image from "next/image";
@@ -109,7 +111,7 @@ function SectionHeading({
   return (
     <header className={`pd-section-heading is-${align}`}>
       {eyebrow && <p className="pd-eyebrow">{eyebrow}</p>}
-      <h2>{title}</h2>
+      <Heading as="h2">{title}</Heading>
       {intro && <p className="pd-section-intro">{intro}</p>}
     </header>
   );
@@ -125,7 +127,7 @@ function IndexRows({ items }: { items: ProductIndexItem[] }) {
           </span>
           <div>
             {item.eyebrow && <p className="pd-row-eyebrow">{item.eyebrow}</p>}
-            <h3>{item.title}</h3>
+            <Heading as="h3">{item.title}</Heading>
             <p>{item.body}</p>
           </div>
         </article>
@@ -190,10 +192,10 @@ export default function ProductDetailTemplate({
             <Link href="/products" className="pd-back-link">
               {backLabel}
             </Link>
-            <h1>
+            <Heading as="h1">
               <span className="pd-product-name">{productName}</span>
               <span className="pd-product-tagline">{title}</span>
-            </h1>
+            </Heading>
             <p className="pd-hero-lede">{lede}</p>
             <p className="pd-concept-note">{conceptNotice}</p>
             <div className="pd-price-row">
@@ -242,7 +244,7 @@ export default function ProductDetailTemplate({
             )}
             {story.noteTitle && (
               <aside className="pd-story-note">
-                <h3>{story.noteTitle}</h3>
+                <Heading as="h3">{story.noteTitle}</Heading>
                 {story.noteBody && <p>{story.noteBody}</p>}
               </aside>
             )}
@@ -274,7 +276,7 @@ export default function ProductDetailTemplate({
                   {scene.eyebrow && (
                     <p className="pd-row-eyebrow">{scene.eyebrow}</p>
                   )}
-                  <h3>{scene.title}</h3>
+                  <Heading as="h3">{scene.title}</Heading>
                   <p>{scene.body}</p>
                   {scene.bullets && (
                     <ul className="pd-bullet-list">
@@ -360,7 +362,7 @@ export default function ProductDetailTemplate({
         <div className="pd-shell pd-final-inner">
           <div>
             <p className="pd-eyebrow">{productName}</p>
-            <h2>{finalTitle}</h2>
+            <Heading as="h2">{finalTitle}</Heading>
             <p>{finalBody}</p>
           </div>
           <div className="pd-final-actions">

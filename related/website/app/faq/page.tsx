@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 import { useMemo, useRef, useState } from "react";
 import Script from "next/script";
 import { Search, X } from "lucide-react";
@@ -39,9 +41,9 @@ export default function FaqPage() {
 
       <section className="container" style={{ padding: "2rem 2rem 3rem" }}>
         <span className="kicker">{t("eyebrow")}</span>
-        <h1 className="serif" style={{ margin: "1rem 0 1.5rem", maxWidth: 700 }}>
+        <Heading as="h1" className="serif" style={{ margin: "1rem 0 1.5rem", maxWidth: 700 }}>
           {t("title")}
-        </h1>
+        </Heading>
         <p style={{ fontSize: "1.15rem", color: "var(--ink-2)", lineHeight: 1.7, maxWidth: 640 }}>
           {t("introBefore")} <a href="mailto:hello@lumiqstudio.com" className="faq-mail">hello@lumiqstudio.com</a> {t("introAfter")}
         </p>

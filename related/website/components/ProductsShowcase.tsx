@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -267,11 +269,11 @@ export default function ProductsShowcase() {
       <section className="container prod-hero">
         <div className="prod-hero-text reveal">
           <span className="prod-kicker">{t("kicker")}</span>
-          <h1 className="serif">
+          <Heading as="h1" className="serif">
             {t("title1")}
             <br />
             <em>{t("title2")}</em>
-          </h1>
+          </Heading>
           <p className="prod-lead">{t("lead")}</p>
           <div className="prod-cta-row">
             <a href="#lineup" className="btn btn-navy">
@@ -320,7 +322,7 @@ export default function ProductsShowcase() {
       <section id="lineup" className="container prod-lineup">
         <div className="prod-lineup-head reveal">
           <span className="prod-kicker">{t("lineup")}</span>
-          <h2 className="serif">{t("lineupTitle")}</h2>
+          <Heading as="h2" className="serif">{t("lineupTitle")}</Heading>
         </div>
 
         <div
@@ -404,7 +406,7 @@ export default function ProductsShowcase() {
                   <div className="prod-panel-body">
                     <span className="prod-index serif" aria-hidden>{p.tag}</span>
                     <span className="prod-pill">{p.pill}</span>
-                    <h3 className="serif">{p.name}</h3>
+                    <Heading as="h3" className="serif">{p.name}</Heading>
                     <div className="prod-sub">{p.sub}</div>
                     <p>{p.desc}</p>
                     <ul className="prod-specs">
@@ -433,7 +435,7 @@ export default function ProductsShowcase() {
       </section>
 
       <section id="all-products" className="container prod-catalog" aria-labelledby="catalog-heading">
-        <h2 id="catalog-heading">{t('catalogTitle')}</h2>
+        <Heading as="h2" id="catalog-heading">{t('catalogTitle')}</Heading>
         <div className="prod-catalog-grid">
           {products.map(product => (
             <Link key={product.id} href={product.href} className="prod-catalog-card" prefetch={false}>
@@ -442,7 +444,7 @@ export default function ProductsShowcase() {
                   sizes="(max-width: 600px) 80vw, 330px" />
               </div>
               <div className="prod-catalog-caption">
-                <h3>{product.name}</h3>
+                <Heading as="h3">{product.name}</Heading>
                 <p className="prod-catalog-description">{product.desc}</p>
                 <span className="prod-catalog-explore">{t('catalogExplore')}</span>
               </div>
@@ -453,7 +455,7 @@ export default function ProductsShowcase() {
               <Image src="/assets/brand/lumiq-logo-transparent-dark.png" alt="LumiQ" width={700} height={700}
                 sizes="(max-width: 600px) 70vw, 260px" />
             </div>
-            <div className="prod-catalog-caption"><h3>more</h3></div>
+            <div className="prod-catalog-caption"><Heading as="h3">more</Heading></div>
           </article>
         </div>
       </section>
@@ -463,7 +465,7 @@ export default function ProductsShowcase() {
         <div className="container prod-story-invite-inner">
           <div className="prod-story-invite-heading">
             <span className="prod-kicker">{t("why")}</span>
-            <h2 className="serif">{t("whyTitle")}</h2>
+            <Heading as="h2" className="serif">{t("whyTitle")}</Heading>
           </div>
           <div className="prod-story-invite-copy">
             <p>{t("whyBody")}</p>

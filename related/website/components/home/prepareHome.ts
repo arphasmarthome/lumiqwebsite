@@ -61,8 +61,7 @@ export async function prepareHome(
   onProgress: (percent: number) => void,
   ownVideo: (url: string) => void,
 ) {
-  const useVideo = window.matchMedia(openingVideoQuery).matches &&
-    new URLSearchParams(location.search).get("opening") !== "code";
+  const useVideo = window.matchMedia(openingVideoQuery).matches;
   const images = Array.from(root.querySelectorAll<HTMLImageElement>("img[data-home-image]"))
     .filter(image => image.getClientRects().length > 0)
     .filter(image => !useVideo || !image.closest(".lh-glass-word, .lh-hero-stage, .lh-brand-character"));

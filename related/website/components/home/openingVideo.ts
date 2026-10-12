@@ -1,13 +1,13 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export const openingVideoSource = "/assets/home-video/ola-scroll-v16-20260909.mp4";
+// Same approved film, short-GOP H.264 for bounded scroll-seek decoding on WebKit.
+export const openingVideoSource = "/assets/home-video/compat-20261008/ola-scroll-v16-scrub.mp4";
 export const openingVideoQuery =
-  "(min-width: 1101px) and (min-height: 600px) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+  "(min-width: 1101px) and (prefers-reduced-motion: no-preference)";
 
 /** One continuous shot, held at its approved first frame until the user scrolls. */
 export function mountOpeningVideo(root: HTMLElement) {
-  if (new URLSearchParams(window.location.search).get("opening") === "code") return () => {};
   const opening = root.querySelector<HTMLElement>(".lh-opening")!;
   const stage = opening.querySelector<HTMLElement>(".lh-opening-stage")!;
   const video = opening.querySelector<HTMLVideoElement>(".lh-opening-video")!;
@@ -16,8 +16,13 @@ export function mountOpeningVideo(root: HTMLElement) {
   const brandCopy = opening.querySelector<HTMLElement>(".lh-ola-copy")!;
   const cards = opening.querySelector<HTMLElement>(".lh-rhythm-cards")!;
   const mm = gsap.matchMedia();
-  mm.add(openingVideoQuery, () => {
+  mm.add({desktop: "(min-width: 1101px)", motion: "(prefers-reduced-motion: no-preference)"}, context => {
+    if (!context.conditions?.desktop) return;
     opening.dataset.videoMode = "true";
+    if (!context.conditions.motion) {
+      opening.dataset.staticOpening = "true";
+      return () => { delete opening.dataset.videoMode; delete opening.dataset.staticOpening; };
+    }
     layer.dataset.intro = "complete";
     let alive = true;
     let frame = 0;
@@ -28,8 +33,10 @@ export function mountOpeningVideo(root: HTMLElement) {
     const tick = () => {
       frame = 0;
       if (!alive || document.hidden || video.error || video.readyState < 2 || video.seeking) return;
-      const desired = playhead.progress * endTime();
-      if (Math.abs(video.currentTime - desired) > 1 / 60) {
+      const bounds = stage.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+      const desired = Math.min(endTime(), Math.round(playhead.progress * endTime() * 24) / 24);
+      if (Math.abs(video.currentTime - desired) > 1 / 48) {
         video.currentTime = desired;
         return;
       }
@@ -40,6 +47,7 @@ export function mountOpeningVideo(root: HTMLElement) {
       heroCopy.inert = playhead.progress > 0.4;
       brandCopy.inert = cards.inert = playhead.progress < 0.43;
       video.dataset.scrollProgress = String(playhead.progress);
+      layer.style.setProperty("--opening-progress", String(playhead.progress));
       schedule();
     };
     const ready = () => { video.pause(); schedule(); };
@@ -96,6 +104,7 @@ export function mountOpeningVideo(root: HTMLElement) {
       delete opening.dataset.videoMode;
       delete layer.dataset.ready;
       delete layer.dataset.intro;
+      layer.style.removeProperty("--opening-progress");
       heroCopy.inert = brandCopy.inert = cards.inert = false;
     };
   });

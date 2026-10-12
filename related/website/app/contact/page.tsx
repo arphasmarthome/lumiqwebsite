@@ -1,3 +1,4 @@
+import Heading from "@/components/Heading";
 import SubPage from "@/components/SubPage";
 import DraftNotice from "@/components/DraftNotice";
 import {useTranslations} from "next-intl";
@@ -29,7 +30,7 @@ export default function ContactPage() {
         </div>
       ))}
 
-      <h2>{t("mailing")}</h2>
+      <Heading as="h2">{t("mailing")}</Heading>
       <DraftNotice compact>{t("addressPending")}</DraftNotice>
       <p>
         LumiqStudio (Arpha Inc.)<br />

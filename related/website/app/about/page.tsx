@@ -1,3 +1,4 @@
+import Heading from "@/components/Heading";
 import SubPage from "@/components/SubPage";
 import {useTranslations} from "next-intl";
 
@@ -19,15 +20,15 @@ export default function AboutPage() {
 
       <p>{t("p3")}</p>
 
-      <h2>{t("whyTitle")}</h2>
+      <Heading as="h2">{t("whyTitle")}</Heading>
       <p>{t.rich("whyP1", {strong: (chunks) => <strong> {chunks}</strong>})}</p>
 
       <p>{t("whyP2")}</p>
 
-      <h2>{t("parentsTitle")}</h2>
+      <Heading as="h2">{t("parentsTitle")}</Heading>
       <p>{t.rich("parentsP", {strong: (chunks) => <strong> {chunks}</strong>})}</p>
 
-      <h2>{t("visionTitle")}</h2>
+      <Heading as="h2">{t("visionTitle")}</Heading>
       <p>{t.rich("visionP", {em: (chunks) => <em>{chunks}</em>})}</p>
 
       <blockquote>{t("quote2")}</blockquote>

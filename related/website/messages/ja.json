@@ -1,4 +1,15 @@
 {
+  "Members": {
+    "nav": "会員エリア", "title": "毎日を、もう少し身近に。", "intro": "デバイス、設定、作品をひとつの場所で整理できます。",
+    "preview": "フロントエンドプレビュー", "previewNotice": "デザインと操作のプレビューです。ログイン、購入履歴、デバイスサービスは未接続です。データはこのブラウザー内だけに保存され、同期・送信されません。",
+    "visitor": "ゲスト", "localOnly": "このブラウザーのみ", "devices": "マイデバイス", "profile": "個人設定", "membership": "会員プラン", "portfolio": "作品投稿", "feedback": "ご意見・お問い合わせ", "help": "お困りですか？",
+    "noDevices": "接続済みデバイスはありません", "noDevicesBody": "サービス開始後、ログインすると購入済みデバイスが表示されます。現在はデモで設定をお試しいただけます。", "showDemo": "デモデバイスを見る", "demoDevice": "デモデバイス", "notConnected": "実際のデバイスは未接続", "demoNotice": "デモは購入履歴ではありません。この設定で実際のデバイスが変更されることはありません。",
+    "settings": "設定", "deviceSettings": "デバイス設定", "deviceName": "デバイス名", "quiet": "夜間の静音モード（デモ）", "deviceNotice": "名前とスイッチはこのブラウザーに保存されます。実際の操作にはデバイスサービスの接続が必要です。", "saveSettings": "設定を保存", "close": "キャンセル", "saved": "このブラウザーに設定を保存しました。", "storageError": "保存できませんでした。ブラウザーのローカル保存を許可して再度お試しください。", "explore": "ほかの LUMIQ 製品を見る",
+    "displayName": "表示名", "displayNamePlaceholder": "お呼びする名前を入力", "notifications": "製品情報を受け取る（デモ）", "profileNotice": "アカウントは作成されず、通知も送信されません。ログインと通知サービスは未接続です。",
+    "notActivated": "未有効化", "planTitle": "あなたに合ったつながり方を", "planBody": "サービス接続後に会員プラン、デバイス特典、更新情報を表示します。現在のプラン案内はご覧いただけますが、契約や支払いは行われません。", "viewPlans": "プランを見る", "noPayment": "このプレビューに購入・支払い機能はありません。",
+    "chooseCover": "作品のカバーを選択", "coverPreview": "カバーのローカルプレビュー", "workTitle": "作品名", "workNotice": "画像はこのページでのみ表示し、アップロードしません。作品名はローカル下書きに保存できます。再読み込み後は画像を再度選択してください。公開にはログインと審査サービスが必要です。", "workSaved": "作品名を下書きに保存しました。投稿は行われていません。", "fileError": "10 MB 以下の PNG、JPEG、WebP 画像を選んでください。",
+    "feedbackType": "種類", "suggestion": "ご提案", "complaint": "ご不満", "content": "内容", "feedbackNotice": "パスワード、支払情報、機密情報は記載しないでください。現在は下書き保存のみで、サポートへは送信されません。", "saveDraft": "下書きを保存", "draftSaved": "このブラウザーに下書きを保存しました。サポートへの送信は行われていません。", "contact": "お問い合わせ"
+  },
   "HomeRefresh": {
     "loading": {
       "label": "あなたを迎える準備をしています",
@@ -604,6 +615,11 @@
     "conceptNotice": "コンセプト仕様——最終機能、4G、位置情報、衝突検知、SOS はブランド確認待ちです。",
     "relationshipEyebrow": "Lumiq Ola と一緒に設計",
     "relationshipTitle": "家では Ola、外出には Ola Go。",
+    "scenesTitle": "日々に必要なことを、手元に。",
+    "connectedTitle": "出先でも、つながりを。",
+    "connectedIntro": "Ola Go の通信と安全機能の構想をご紹介します。最終的な機能とサービス範囲はブランド側の確認待ちです。",
+    "closingTitle": "持ち歩けるパートナーを知る。",
+    "closingBody": "Ola Go は LUMIQ OLA に同梱する予定です。ウェイトリストで発売に関する最新情報をお受け取りください。",
     "relationshipBody": "Ola Go は単体販売ではなく、Ola への付属を予定しています。",
     "remindersTitle": "携帯リマインダー",
     "remindersBody": "外出先で予定を知らせる構想。",

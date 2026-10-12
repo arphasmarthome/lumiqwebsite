@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -305,12 +307,12 @@ export default function PlansContent() {
         style={{ padding: "2rem 2rem 4rem", maxWidth: 1100 }}
       >
         <span className="kicker">{t("eyebrow")}</span>
-        <h1
+        <Heading as="h1"
           className="lq-h1 serif"
           style={{ margin: "1rem 0 1.25rem", maxWidth: 760 }}
         >
           {t("title")}
-        </h1>
+        </Heading>
         <p className="lq-body" style={{ color: "var(--ink-2)", maxWidth: 560 }}>
           {t("intro")}
         </p>
@@ -331,7 +333,7 @@ export default function PlansContent() {
                   sizes="(max-width: 820px) 100vw, 33vw"
                 />
               </div>
-              <h3
+              <Heading as="h3"
                 className="serif"
                 style={{
                   fontSize: "var(--lq-h3)",
@@ -339,7 +341,7 @@ export default function PlansContent() {
                 }}
               >
                 {h.name}
-              </h3>
+              </Heading>
               <p
                 style={{
                   color: "var(--ink-3)",
@@ -411,7 +413,7 @@ export default function PlansContent() {
           <span className="kicker" style={{ justifyContent: "center" }}>
             {t("tabletKicker")}
           </span>
-          <h2 className="lq-h2 serif">{t("tabletTitle")}</h2>
+          <Heading as="h2" className="lq-h2 serif">{t("tabletTitle")}</Heading>
         </div>
         <PlanTable
           cols={tabletCols}
@@ -435,7 +437,7 @@ export default function PlansContent() {
           <span className="kicker" style={{ justifyContent: "center" }}>
             {t("palKicker")}
           </span>
-          <h2 className="lq-h2 serif">{t("palTitle")}</h2>
+          <Heading as="h2" className="lq-h2 serif">{t("palTitle")}</Heading>
         </div>
         <PlanTable
           cols={palCols}

@@ -15,3 +15,22 @@
 .lh-fixed-backgrounds { position: fixed; inset: 0; pointer-events: none; background: #f8f7fc; }
 .lh-fixed-backgrounds > div { position: absolute; inset: 0; background-position: center; background-size: cover; background-repeat: no-repeat; }
 .lh-home :is(.lh-products, .lh-films-section, .lh-experiences, .lh-safety, .lh-family, .lh-join)::before { display: none; }
+
+/* Only the new desktop film needs light foregrounds in its final two chapters.
+   Static/reduced-motion layouts and the first two screens keep their palette. */
+.lumiq-root[data-flow-background="true"] .lh-home :is(.lh-family, .lh-join) {
+  --lh-ink: #f7f8fc;
+  --lh-muted: #dce3f2;
+  color: var(--lh-ink);
+}
+.lumiq-root[data-flow-background="true"] :is(.lh-family-heading, .lh-join-copy) :is(h2, .lh-text-link) { color: #f7f8fc; }
+.lumiq-root[data-flow-background="true"] :is(.lh-family-heading, .lh-join-copy) :is(.lh-muted, .lh-lead, .lh-eyebrow, .lh-section-intro) { color: #dce3f2; }
+.lumiq-root[data-flow-background="true"] .lh-home .lh-join :is(label, .lh-consent, .lh-consent a) { color: #dce3f2; }
+.lumiq-root[data-flow-background="true"] .lh-join .lh-email-row { background: #ffffffed; border-color: #ffffff80; }
+.lumiq-root[data-flow-background="true"] :is(.lh-family, .lh-join) :focus-visible { outline-color: #d6e9ff; }
+.lumiq-root[data-flow-background="true"] > .footer { color: #dce3f2; }
+.lumiq-root[data-flow-background="true"] > .footer :is(h4, a) { color: #dce3f2; }
+.lumiq-root[data-flow-background="true"] .lh-home .lh-safety { --lh-ink: #0c1629; --lh-muted: #152439; }
+.lumiq-root[data-flow-background="true"] .lh-home .lh-safety :is(.lh-muted, .lh-lead, .lh-principle p, .lh-principle-top, .lh-trust-caption, .lh-principle-arrow) { color: #152439; }
+.lumiq-root[data-flow-background="true"] .lh-family .lh-chapter-navigation button { color: #dce3f2; }
+.lumiq-root[data-flow-background="true"]:has(.lh-home) > .footer .foot-nav h4 { color: #dce3f2; }

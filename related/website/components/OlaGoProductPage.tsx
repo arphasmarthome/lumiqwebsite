@@ -39,7 +39,7 @@ export default function OlaGoProductPage() {
         },
       }}
       scenesEyebrow={t("relationshipEyebrow")}
-      scenesTitle={t("title")}
+      scenesTitle={t("scenesTitle")}
       scenes={firstFeatures.map((key, index) => ({
         eyebrow: String(index + 1).padStart(2, "0"),
         title: t(`${key}Title`),
@@ -56,8 +56,8 @@ export default function OlaGoProductPage() {
       }))}
       features={{
         eyebrow: t("relationshipEyebrow"),
-        title: t("relationshipTitle"),
-        intro: t("relationshipBody"),
+        title: t("connectedTitle"),
+        intro: t("connectedIntro"),
         items: connectedFeatures.map((key) => ({
           title: t(`${key}Title`),
           body: t(`${key}Body`),
@@ -82,8 +82,8 @@ export default function OlaGoProductPage() {
           fit: "contain",
         },
       }}
-      finalTitle={t("relationshipTitle")}
-      finalBody={t("relationshipBody")}
+      finalTitle={t("closingTitle")}
+      finalBody={t("closingBody")}
       secondaryAction={{ href: "/products/ola", label: t("meetOla") }}
     />
   );

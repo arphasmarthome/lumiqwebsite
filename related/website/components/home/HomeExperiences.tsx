@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 import Image from "@/components/home/HomeImage";
 import { useTranslations } from "next-intl";
 import { useState, type CSSProperties } from "react";
@@ -19,7 +21,7 @@ export default function HomeExperiences() {
   return (
     <div className="lh-room-layout">
       <div className="lh-room-heading" data-home-reveal>
-        <h2 id="experiences-title">{t("roomHeading.line1")}<br />{t("roomHeading.line2")}<br />{t("roomHeading.line3")}</h2>
+        <Heading as="h2" id="experiences-title">{t("roomHeading.line1")}<br />{t("roomHeading.line2")}<br />{t("roomHeading.line3")}</Heading>
         <p className="lh-room-intro">{t("experienceBody")}</p>
       </div>
       <div className="lh-room-map">

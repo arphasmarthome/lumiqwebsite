@@ -10,6 +10,7 @@ import Image from "next/image";
 export default function SiteHeader() {
   const t = useTranslations("Common");
   const home = useTranslations("HomeRefresh");
+  const members = useTranslations("Members");
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function SiteHeader() {
     { href: "/products", label: t("products") },
     { href: "/story", label: t("brandStory") },
     { href: "/plans", label: t("plans") },
+    { href: "/members", label: members("nav") },
     { href: "/faq", label: t("faq") },
   ] as const;
 
@@ -54,7 +56,7 @@ export default function SiteHeader() {
   }, [menuOpen]);
 
   useEffect(() => {
-    const wide = window.matchMedia("(min-width: 1024px)");
+    const wide = window.matchMedia("(min-width: 1200px)");
     const closeOnWide = () => {
       if (wide.matches) setMenuOpen(false);
     };
@@ -136,7 +138,7 @@ export default function SiteHeader() {
         </a>
       )}
       <div className="container nav-inner">
-        <Link prefetch={isHomepage ? false : undefined} href="/" className="nav-logo" onClick={closeMenu}>
+        <Link prefetch={false} href="/" className="nav-logo" onClick={closeMenu}>
           <Image
             src="/assets/brand/lumiq-logo-transparent-dark.png"
             alt={isHomepage ? "LUMIQ Studio" : "LumiQ Studio"}
@@ -153,7 +155,7 @@ export default function SiteHeader() {
         >
           {nav.map((l) => (
             <Link
-              prefetch={isHomepage ? false : undefined}
+              prefetch={false}
               key={l.href}
               href={l.href}
               className={isActive(l.href) ? "active" : ""}
@@ -196,7 +198,7 @@ export default function SiteHeader() {
             )}
           </div>
           <Link
-              prefetch={isHomepage ? false : undefined}
+            prefetch={false}
             href="/prelaunch"
             onClick={closeMenu}
             className="btn btn-ghost-navy login-btn site-login-btn"
@@ -242,7 +244,7 @@ export default function SiteHeader() {
         </div>
         {nav.map((l) => (
           <Link
-              prefetch={isHomepage ? false : undefined}
+            prefetch={false}
             key={l.href}
             href={l.href}
             role="menuitem"

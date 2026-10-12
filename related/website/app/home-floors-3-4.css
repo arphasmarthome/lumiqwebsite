@@ -111,7 +111,7 @@
 }
 
 .lh-home .lh-room-section { padding: 0; background: #f0edf5; isolation: isolate; }
-.lh-room-layout { position: relative; isolation: isolate; max-width: 1920px; min-height: max(780px, min(56.25vw,1080px)); margin: auto; display: grid; grid-template-columns: 28% 1fr; align-items: center; padding: 80px 5%; }
+.lh-room-layout { position: relative; isolation: isolate; overflow: clip; max-width: 1920px; min-height: max(780px, min(56.25vw,1080px)); margin: auto; display: grid; grid-template-columns: 28% 1fr; align-items: center; padding: 80px 5%; }
 .lh-room-heading { position: relative; z-index: 2; grid-column: 1; padding-bottom: 10px; }
 .lh-home .lh-room-heading h2 { font-size: clamp(32px,2.8vw,54px); line-height: 1.12; letter-spacing: -.025em; text-transform: uppercase; color: #192434; }
 .lh-home .lh-room-intro { margin: 28px 0 0; max-width: 26ch; font-size: clamp(14px,1.05vw,19px); line-height: 1.7; color: #5c6878; }
@@ -133,7 +133,8 @@
 .lh-room-label > span { display: block; font-size: clamp(11px,.9vw,17px); text-transform: uppercase; font-weight: 500; letter-spacing: .01em; }
 .lh-room-label small { display: block; font-size: clamp(10px,.8vw,15px); margin-top: 4px; color: #637186; }
 .lh-room-mobile-links { display: none; }
-.lh-room-layout[data-reading=true] { min-height: var(--room-height); height: var(--room-height); }
+.lh-home .lh-room-section[data-room-sticky=true] { height: var(--room-stage-height); }
+.lh-room-layout[data-reading=true] { position: sticky; top: var(--room-top); min-height: var(--room-height); height: var(--room-height); }
 .lh-room-layout[data-reading=true] .lh-room-canvas {
   width: min(100%,calc((var(--room-height) - 48px)*16/9));
   height: min(1080px,56.25vw,calc(var(--room-height) - 48px));
@@ -141,7 +142,7 @@
   top: calc((var(--room-height) - min(1080px,56.25vw,calc(var(--room-height) - 48px)))/2);
 }
 .lh-room-layout[data-reading=true] .lh-room-background {
-  mask-image: linear-gradient(transparent,#000 8%,#000 92%,transparent),linear-gradient(90deg,transparent,#000 12%);
+  mask-image: linear-gradient(transparent,#000 8%,#000 92%,transparent),linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
   mask-composite: intersect;
 }
 @media (min-width:1921px) {
