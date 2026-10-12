@@ -1,4 +1,7 @@
 /* Shared outer rhythm. Keep hero/scroll-stage geometry and all inner layouts intact. */
+[data-scroll-reveal="pending"] { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { [data-scroll-reveal="pending"] { opacity: 1; } }
+@media print { [data-scroll-reveal="pending"] { opacity: 1; } }
 .lumiq-root {
   --lq-section-gap: 128px;
   --lq-section-edge: calc(var(--lq-section-gap) / 2);
@@ -23,5 +26,5 @@
 }
 /* Arrow position follows the rendered carousel, never the space after it. */
 .lumiq-root .lh-home .lh-products[data-glass-3d] .lh-products-footer {
-  top: calc(100% - 12px - var(--carousel-height) * .47);
+  top: calc(100% - var(--lq-section-edge) - var(--carousel-height) * .61);
 }

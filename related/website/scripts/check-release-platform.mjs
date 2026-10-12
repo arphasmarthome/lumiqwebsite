@@ -15,7 +15,12 @@ for(const [engine,type] of Object.entries(engines)){
  const browser=await type.launch(engine==='edge'?{channel:'msedge'}:{});
  const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
  for(const locale of ['en','zh-hant','ja'])for(const route of routes){
-  const response=await page.goto(`${base}/${locale}${route}`,{waitUntil:'load'});
+  // Slow/unsupported media must not hold the layout audit at window.load.
+  // Wait for the actual page and its typography instead of unrelated videos.
+  const response=await page.goto(`${base}/${locale}${route}`,{waitUntil:'domcontentloaded',timeout:60000});
+  await page.locator('main').waitFor();
+  await page.evaluate(()=>document.fonts.ready);
+  if(!route)await page.waitForFunction(()=>document.querySelector('.lh-home')?.dataset.homeState==='open',null,{timeout:60000});
   await page.waitForTimeout(250);
   for(const viewport of sizes){
    await page.setViewportSize(viewport);await page.waitForTimeout(120);

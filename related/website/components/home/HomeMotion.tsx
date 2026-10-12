@@ -39,7 +39,6 @@ export default function HomeMotion({ children }: { children: ReactNode }) {
         },
         (context) => {
           if (!context.conditions?.desktop) return;
-          const select = gsap.utils.selector(root);
           gsap.fromTo(
             ".lh-room-canvas",
             { y: 28 },
@@ -54,15 +53,8 @@ export default function HomeMotion({ children }: { children: ReactNode }) {
               },
             },
           );
-          select("[data-home-reveal]").forEach((element: Element) => {
-            if (element.closest(".lh-opening[data-video-mode]")) return;
-            gsap.from(element, {
-              y: 42,
-              duration: 0.85,
-              ease: "power3.out",
-              scrollTrigger: { trigger: element, start: "top 92%", once: true },
-            });
-          });
+          // ScrollWords owns whole-text entry at every viewport size. Avoid a
+          // second ancestor transform consuming the entrance before it is visible.
           let alive = true;
           document.fonts.ready.then(() => {
             if (alive) ScrollTrigger.refresh();

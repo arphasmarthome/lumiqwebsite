@@ -18,7 +18,8 @@ export default function HomeFilms() {
   const video = useRef<HTMLVideoElement>(null);
   const character = useRef<HTMLVideoElement>(null);
   const characterHost = useRef<HTMLDivElement>(null);
-  const [alphaVideo, setAlphaVideo] = useState(false);
+  const [characterFormat, setCharacterFormat] = useState<"webm" | "hevc" | null>(null);
+  const [characterFailed, setCharacterFailed] = useState(false);
   const stage = useRef<HTMLDivElement>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const [travel, setTravel] = useState(0);
@@ -44,10 +45,10 @@ export default function HomeFilms() {
     return mountHorizontalCarousel(target, select, () => switching.current);
   }, [select]);
   useEffect(() => {
-    // WebKit can decode this VP9 clip without its alpha channel, leaving a white box.
-    // Use the cleaned transparent PNG on Safari/iOS instead of a chroma-key patch.
+    // VP9 support is not proof of VP9 alpha support. WebKit gets the same cleaned
+    // animation encoded with HEVC alpha; Chromium/Firefox retain transparent VP9.
     const ua = navigator.userAgent;
-    setAlphaVideo(!/iPad|iPhone|iPod/.test(ua) && /Chrome|Chromium|Edg|Firefox/.test(ua));
+    setCharacterFormat(/iPad|iPhone|iPod/.test(ua) || (/Safari/.test(ua) && !/Chrome|Chromium|Edg|Firefox/.test(ua)) ? "hevc" : "webm");
   }, []);
   useEffect(() => {
     const element = video.current;
@@ -76,9 +77,21 @@ export default function HomeFilms() {
     const target = stage.current;
     if (!host || !target) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    let visible = false;
+    let disposed = false;
+    if (clip) { clip.muted = true; clip.defaultMuted = true; }
+    const sync = () => {
+      const showing = visible && !document.hidden && !reduced.matches && innerWidth > 1100;
+      host.dataset.visible = String(showing);
+      if (!clip) return;
+      if (!showing) clip.pause();
+      else if (!clip.ended) void clip.play().catch(() => {
+        if (!disposed && showing && clip.error) setCharacterFailed(true);
+      });
+    };
     const placeCharacter = () => {
       if (innerWidth <= 1100) {
-        clip?.pause();
+        sync();
         return;
       }
       host.style.removeProperty('top');
@@ -91,34 +104,33 @@ export default function HomeFilms() {
       const availableHeight = Math.max(0, host.parentElement!.clientHeight * .94 - headingBottom - 24);
       const width = Math.min(innerWidth * .34, 760, availableHeight) * 16 / 9;
       host.style.width = `${width}px`;
+      sync();
     };
     const resize = new ResizeObserver(placeCharacter);
     resize.observe(target);
     resize.observe(host.parentElement!);
     window.addEventListener("resize", placeCharacter);
     placeCharacter();
-    let visible = false;
-    const sync = () => {
-      host.dataset.visible = String(visible && !document.hidden && !reduced.matches && innerWidth > 1100);
-      if (!clip) return;
-      if (!visible || document.hidden || reduced.matches || innerWidth <= 1100) clip.pause();
-      else if (!clip.ended) void clip.play().catch(() => {});
-    };
     const observer = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
-      if (!visible && clip) { clip.pause(); clip.currentTime = 0; }
+      // Pause below the reading threshold, but rewind only on full departure.
+      // A small back-scroll must not repeatedly restart her entrance.
+      visible = entry.isIntersecting && entry.intersectionRatio >= 0.2;
+      if (!entry.isIntersecting && clip) { clip.pause(); if (clip.currentTime) clip.currentTime = 0; }
       sync();
-    }, { threshold: 0.35 });
+    }, { threshold: [0, 0.2] });
     observer.observe(target);
     document.addEventListener("visibilitychange", sync);
     reduced.addEventListener("change", sync);
+    clip?.addEventListener("loadeddata", sync);
     return () => {
+      disposed = true;
       clip?.pause(); observer.disconnect(); resize.disconnect();
       window.removeEventListener("resize", placeCharacter);
       document.removeEventListener("visibilitychange", sync);
       reduced.removeEventListener("change", sync);
+      clip?.removeEventListener("loadeddata", sync);
     };
-  }, [alphaVideo]);
+  }, [characterFormat, characterFailed]);
   const toggle = async () => {
     if (!video.current) return;
     if (video.current.error || video.current.networkState === HTMLMediaElement.NETWORK_NO_SOURCE) {
@@ -170,9 +182,9 @@ export default function HomeFilms() {
         <button type="button" onClick={() => select(1)} disabled={travel !== 0} aria-label={t("next")}><ArrowDown size={24} /></button>
       </nav>
       </div>
-      <div ref={characterHost} className="lh-film-character" data-alpha-video={alphaVideo} aria-hidden="true">
-      {alphaVideo ? <video ref={character} muted playsInline preload="none" poster="/assets/character-20261012/poster-clean.png">
-        <source src="/assets/character-20261012/ola-girl-clean-alpha.webm" type="video/webm" />
+      <div ref={characterHost} className="lh-film-character" data-alpha-video={Boolean(characterFormat && !characterFailed)} aria-hidden="true">
+      {characterFormat && !characterFailed ? <video key={characterFormat} ref={character} muted playsInline preload="none" poster="/assets/character-20261012/poster-clean.png" onError={() => setCharacterFailed(true)}>
+        <source src={`/assets/character-20261012/ola-girl-clean-alpha${characterFormat === "hevc" ? "-safari.mov" : ".webm"}`} type={characterFormat === "hevc" ? 'video/quicktime; codecs="hvc1"' : "video/webm"} />
       </video> : <Image src="/assets/character-20261012/settled-clean.png" alt="" fill unoptimized sizes="100vw" />}
       </div>
     </div>
