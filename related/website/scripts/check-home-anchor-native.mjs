@@ -20,6 +20,10 @@ async function ready(){
 }
 const state=()=>js("const e=document.getElementById('products'),r=e.getBoundingClientRect();return {width:innerWidth,height:innerHeight,y:scrollY,top:r.top,bottom:r.bottom,hash:location.hash,overflow:document.documentElement.scrollWidth>innerWidth+1};");
 const aligned=async label=>{const s=await state();assert(s.top<160&&s.bottom>160,`${label}: ${JSON.stringify(s)}`);assert.equal(s.overflow,false);return s;};
+const arrow = async value => {
+ await js("document.querySelector('.lh-home').focus({preventScroll:true});return true");
+ return command('actions',{actions:[{type:'key',id:'anchor-keyboard',actions:[{type:'keyDown',value},{type:'keyUp',value}]}]});
+};
 const results=[],failures=[];
 for(const locale of ['en','zh-hant','ja']){
  try{
@@ -44,7 +48,14 @@ for(const locale of ['en','zh-hant','ja']){
   // Safari's driver back endpoint can skip same-document SPA entries. Exercise
   // the browser's history operation directly, retaining the native renderer.
   await js('history.back();return true');await ready();const returned=await aligned('browser back');
-  results.push({locale,widths,refreshed,returned});console.log(`PASS native Safari ${locale}: resize, refresh, browser back`);
+  await arrow('\uE015');await sleep(600);const heightBefore=await state();
+  await command('window/rect',{width:1440,height:800});await sleep(1200);const heightAfter=await state();
+  assert(Math.abs(heightAfter.top-heightBefore.top)<2,`Manual reading moved after height resize: ${JSON.stringify({heightBefore,heightAfter})}`);
+  await command('window/rect',{width:500,height:1000});await command('refresh',{});await ready();await aligned('fresh narrow entry');
+  await arrow('\uE013');await sleep(600);const widthBefore=await state();
+  await command('window/rect',{width:1440,height:1000});await sleep(1200);const widthAfter=await state();
+  assert(Math.abs(widthAfter.top-widthBefore.top)<2,`Manual reading moved after width resize: ${JSON.stringify({widthBefore,widthAfter})}`);
+  results.push({locale,widths,refreshed,returned,heightBefore,heightAfter,widthBefore,widthAfter});console.log(`PASS native Safari ${locale}: resize, refresh, browser back, manual height/width resize`);
  }catch(e){failures.push({locale,error:e.message});console.log(`FAIL native Safari ${locale}: ${e.message}`);}
 }
 await fs.writeFile(`${out}/report.json`,JSON.stringify({base,results,failures},null,2));

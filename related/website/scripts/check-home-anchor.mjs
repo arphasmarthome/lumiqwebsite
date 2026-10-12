@@ -41,6 +41,37 @@ for(const engine of (process.env.ENGINE?[process.env.ENGINE]:Object.keys(types))
     await page.mouse.move(25,500);await page.mouse.wheel(0,1800);await page.waitForTimeout(300);await page.mouse.wheel(0,700);await page.waitForTimeout(900);const moved=await state();assert(moved.top<-300,'A fresh wheel gesture must leave product anchor');
     await page.setViewportSize({width:1920,height:1000});await page.waitForTimeout(900);const after=await state();assert(after.top<-300,'Resizing must not pull the reader back to a stale URL hash');return {moved,after};
    });
+   await check(`${locale} manual reading survives height-only resize`,async()=>{
+    await page.setViewportSize({width:1440,height:1000});await page.goto(`${base}/${locale}#products`);await ready();
+    await page.keyboard.press('ArrowDown');await page.waitForTimeout(600);const before=await state();
+    await page.setViewportSize({width:1440,height:800});await page.waitForTimeout(1200);const after=await state();
+    assert(Math.abs(after.top-before.top)<2,`Reading position changed after height resize: ${JSON.stringify({before,after})}`);return {before,after};
+   });
+   await check(`${locale} manual reading survives narrow to wide resize`,async()=>{
+    await page.setViewportSize({width:390,height:1000});await page.goto(`${base}/${locale}#products`);await ready();
+    await page.keyboard.press('ArrowUp');await page.waitForTimeout(600);const before=await state();
+    await page.setViewportSize({width:1440,height:1000});await page.waitForTimeout(1200);const after=await state();
+    assert(Math.abs(after.top-before.top)<2,`Reading position changed after width resize: ${JSON.stringify({before,after})}`);return {before,after};
+   });
+   await check(`${locale} wheel input cancels pending resize restoration`,async()=>{
+    await page.setViewportSize({width:1440,height:1000});await page.goto(`${base}/${locale}#products`);await ready();
+    await page.keyboard.press('ArrowDown');await page.waitForTimeout(600);await page.setViewportSize({width:1440,height:800});
+    await page.mouse.move(25,500);await page.mouse.wheel(0,20000);await page.waitForTimeout(1600);
+    // A large wheel pulse deliberately stops at the next reading composition.
+    // Verify that resize restoration does not pull it back to the product
+    // chapter; reaching the document bottom belongs to the End-key test below.
+    const after=await state();
+    assert(after.top<-300,`Resize restoration interrupted wheel input: ${JSON.stringify(after)}`);return after;
+   });
+   // WebKit's End key does not consistently scroll the document; wheel input
+   // above exercises cancellation in that engine using its native scroll path.
+   if(engine!=='webkit')await check(`${locale} keyboard input cancels pending resize restoration`,async()=>{
+    await page.setViewportSize({width:1440,height:1000});await page.goto(`${base}/${locale}#products`);await ready();
+    await page.keyboard.press('ArrowDown');await page.waitForTimeout(600);await page.setViewportSize({width:1440,height:800});
+    await page.keyboard.press('End');await page.waitForTimeout(1600);
+    const after=await page.evaluate(()=>({y:scrollY,max:document.documentElement.scrollHeight-innerHeight}));
+    assert(Math.abs(after.max-after.y)<2,`Resize restoration interrupted keyboard input: ${JSON.stringify(after)}`);return after;
+   });
    await check(`${locale} browser back restores anchor`,async()=>{
     await page.setViewportSize({width:1440,height:1000});await page.goto(`${base}/${locale}/faq`);await page.goto(`${base}/${locale}#products`);await ready();
     await page.locator('.site-desktop-nav a[href$="/faq"]').click();await page.waitForURL('**/faq');await page.locator('.lh-home').waitFor({state:'detached'});await page.goBack();await ready();return aligned('history return');

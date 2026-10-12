@@ -26,14 +26,21 @@ export function mountHomePosition(root: HTMLElement) {
   let alive = true;
   let frame = 0;
   let captureFrame = 0;
+  let layoutTimer = 0;
+  let inputTimer = 0;
 
   const capture = () => {
-    if (changingLayout || scrollState.isRefreshing) return;
+    if (inputTimer || changingLayout || restoring || scrollState.isRefreshing) return;
     const landing = navTop();
-    const visible = sections.find(section => {
+    let visible: HTMLElement | null = null;
+    let visibleHeight = 0;
+    for (const section of sections) {
       const bounds = section.getBoundingClientRect();
-      return bounds.top <= landing + 160 && bounds.bottom > landing;
-    });
+      const height = Math.min(bounds.bottom, innerHeight) - Math.max(bounds.top, landing);
+      if (height > visibleHeight) { visible = section; visibleHeight = height; }
+    }
+    // A sliver of the previous opening chapter must not hide a mostly visible
+    // product section. Rank viewport coverage before delegating opening layout.
     reading = visible && !visible.closest(".lh-opening")
       ? { element: visible, top: visible.getBoundingClientRect().top }
       : null;
@@ -47,23 +54,50 @@ export function mountHomePosition(root: HTMLElement) {
       ScrollTrigger.update();
       aligned = true;
     }
-    restoring = null;
     changingLayout = false;
     capture();
   };
   const schedule = () => { if (alive && !frame) frame = requestAnimationFrame(settle); };
   const resize = () => {
+    if (inputTimer) { releaseLayout(); return; }
     restoring ??= reading;
     changingLayout = true;
+    clearTimeout(layoutTimer);
+    // ScrollTrigger batches resize refreshes for 200ms. Keep the original
+    // section through that batch and any font refresh, not just the first RAF.
+    layoutTimer = window.setTimeout(() => {
+      layoutTimer = 0;
+      restoring = null;
+      changingLayout = false;
+      capture();
+    }, 300);
     schedule();
   };
   const refresh = () => { if (target || restoring) schedule(); };
-  const navigate = () => { target = hashTarget(); aligned = false; schedule(); };
-  const input = () => { target = null; restoring = null; };
+  const releaseLayout = () => {
+    clearTimeout(layoutTimer);
+    layoutTimer = 0;
+    restoring = null;
+    changingLayout = false;
+  };
+  const navigate = () => {
+    clearTimeout(inputTimer); inputTimer = 0;
+    releaseLayout(); target = hashTarget(); aligned = false; schedule();
+  };
+  const waitForInput = () => {
+    clearTimeout(inputTimer);
+    inputTimer = window.setTimeout(() => { inputTimer = 0; capture(); }, 300);
+  };
+  const input = () => {
+    target = null; reading = null; releaseLayout(); waitForInput();
+  };
   const key = (event: KeyboardEvent) => {
     if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) input();
   };
   const scroll = () => {
+    // A refresh arriving after End/wheel must not reacquire the pre-gesture
+    // snapshot. Resume capture only when the user's scrolling has settled.
+    if (inputTimer) { waitForInput(); return; }
     if (changingLayout || scrollState.isRefreshing || frame || captureFrame) return;
     captureFrame = requestAnimationFrame(() => {
       captureFrame = 0;
@@ -81,6 +115,7 @@ export function mountHomePosition(root: HTMLElement) {
   // matchMedia can reset scroll before the DOM reports the resize. Use the
   // last settled section snapshot, and restore only after the new pins exist.
   mediaEvents.addEventListener("matchMediaInit", resize);
+  ScrollTrigger.addEventListener("refreshInit", resize);
   ScrollTrigger.addEventListener("refresh", refresh);
   window.addEventListener("resize", resize);
   window.addEventListener("hashchange", navigate);
@@ -99,7 +134,10 @@ export function mountHomePosition(root: HTMLElement) {
     alive = false;
     cancelAnimationFrame(frame);
     cancelAnimationFrame(captureFrame);
+    clearTimeout(layoutTimer);
+    clearTimeout(inputTimer);
     mediaEvents.removeEventListener("matchMediaInit", resize);
+    ScrollTrigger.removeEventListener("refreshInit", resize);
     ScrollTrigger.removeEventListener("refresh", refresh);
     window.removeEventListener("resize", resize);
     window.removeEventListener("hashchange", navigate);
