@@ -21,7 +21,11 @@ for(const name of engines) {
   await page.waitForFunction(()=>document.querySelector('.lh-home')?.dataset.homeState==='open');
   await page.evaluate(()=>Promise.race([document.fonts.ready,new Promise(resolve=>setTimeout(resolve,10000))]));
   await page.waitForTimeout(1000);
-  for(const viewport of [{width:1440,height:900},{width:3440,height:1440},{width:1024,height:1280},{width:320,height:740}]) {
+  const sizes=process.env.FOCUSED==='1'?[{width:1440,height:900},{width:3440,height:1440},{width:1440,height:900},{width:3440,height:1440}]:[{width:1440,height:900},{width:3440,height:1440},{width:1024,height:1280},{width:320,height:740}];
+  const visited=new Set();
+  for(const viewport of sizes) {
+   const key=`${viewport.width}x${viewport.height}`;
+   const sample=visited.has(key)?'repeat-entry':'first-sample';visited.add(key);
    await page.setViewportSize(viewport);await page.waitForTimeout(500);
    for(const part of ['opening','films-background']) {
     try {
@@ -46,19 +50,20 @@ for(const name of engines) {
         scrollTo({top:Math.max(0,from+(to-from)*travel),behavior:'instant'});
         frames.push({dt:time-last,y:scrollY,bg:bg?.dataset.ready,opacity:bg?.style.opacity,bgTime:bg?.currentTime,bgSeeking:bg?.seeking,openingTime:document.querySelector('.lh-opening-video').currentTime});
         last=time;
-        if(progress<1)requestAnimationFrame(sample);else resolve({from,to,frames,renderer,overflow:document.documentElement.scrollWidth>innerWidth+1});
+        if(progress<1)requestAnimationFrame(sample);else resolve({from,to,frames,renderer,actualViewport:{width:innerWidth,height:innerHeight},overflow:document.documentElement.scrollWidth>innerWidth+1});
        }
        requestAnimationFrame(sample);
       });
      },part);
      const intervals=data.frames.slice(1).map(f=>f.dt).sort((a,b)=>a-b);
+     assert.deepEqual(data.actualViewport,viewport,'The browser must apply the requested viewport; a fixed-size headed WebKit window is not ultrawide evidence');
      const ready=data.frames.findIndex(f=>f.bg==='true');
      const rehidden=ready>=0?data.frames.slice(ready).filter(f=>f.bg!=='true'||f.opacity!=='1').length:0;
-     const result={engine:name,version:browser.version(),systemChrome:process.env.CHROME_SYSTEM==='1',headed:process.env.HEADED==='1',renderer:data.renderer,viewport,part,from:data.from,to:data.to,frames:data.frames.length,p50:intervals[Math.floor(intervals.length*.5)],p95:intervals[Math.floor(intervals.length*.95)],max:Math.max(...intervals),over50ms:intervals.filter(v=>v>50).length,over100ms:intervals.filter(v=>v>100).length,backgroundRehidden:rehidden,overflow:data.overflow,backgroundEverReady:ready>=0};
+     const result={engine:name,version:browser.version(),systemChrome:name==='chromium'&&process.env.CHROME_SYSTEM==='1',headed:process.env.HEADED==='1',renderer:data.renderer,viewport,actualViewport:data.actualViewport,sample,part,from:data.from,to:data.to,frames:data.frames.length,p50:intervals[Math.floor(intervals.length*.5)],p95:intervals[Math.floor(intervals.length*.95)],max:Math.max(...intervals),over50ms:intervals.filter(v=>v>50).length,over100ms:intervals.filter(v=>v>100).length,backgroundRehidden:rehidden,overflow:data.overflow,backgroundEverReady:ready>=0};
      checks.push(result);console.log('PASS',JSON.stringify(result));
      assert.equal(rehidden,0,'Decoded background must not flicker to the fallback during seek');
      assert.equal(data.overflow,false,'Viewport must not overflow during animation');
-     await fs.writeFile(`${output}/${name}-${viewport.width}-${part}-frames.json`,JSON.stringify(data,null,2));
+     await fs.writeFile(`${output}/${name}-${viewport.width}-${sample}-${part}-frames.json`,JSON.stringify(data,null,2));
     }catch(error){failures.push({engine:name,viewport,part,error:error.message});console.log('FAIL',error.message);}
     await save();
    }
