@@ -39,7 +39,7 @@ for(const [engine,type] of Object.entries(engines)){
   browser=await stage({engine},'launch',()=>type.launch(engine==='edge'?{channel:'msedge',timeout:timeoutMs}:{timeout:timeoutMs}));
   const page=await stage({engine},'new-page',()=>browser.newPage());
   page.setDefaultTimeout(timeoutMs);page.setDefaultNavigationTimeout(navigationTimeoutMs);
-  page.on('pageerror',e=>errors.push(e.message));
+  page.on('pageerror',e=>errors.push({message:e.message,stack:e.stack}));
   for(const locale of ['en','zh-hant','ja'])for(const route of routes){
    const context={engine,locale,route};
    try{

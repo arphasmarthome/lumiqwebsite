@@ -6,6 +6,7 @@ import {Environment, Lightformer, MeshTransmissionMaterial} from "@react-three/d
 import {CanvasTexture, LinearToneMapping, OrthographicCamera, SRGBColorSpace} from "three";
 import {createPillowGeometry} from "@/lib/pillow-glass";
 import {glassFlowPhase} from "@/lib/glass-flow";
+import {decorativeGlassEvents, glassIsVisible} from "@/lib/glass-visibility";
 
 let webglAvailable: boolean | undefined;
 function canRenderGlass() {
@@ -129,11 +130,11 @@ export default function GlassCardMaterial({animated = false, variant = 0}: {anim
     // Keep the frosted fallback while offscreen. Three hidden transmission
     // canvases otherwise allocate/reproject together on every viewport resize.
     const observer = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting && entry.boundingClientRect.width > 0 && entry.boundingClientRect.height > 0;
+      visible = glassIsVisible(entry);
       if (visible) setSupported(canRenderGlass());
       setInView(visible);
       update();
-    }, {rootMargin: '150px'});
+    }, {rootMargin: '0px', threshold: [0, .2]});
     if (container.current) observer.observe(container.current);
     reduced.addEventListener('change', update);
     document.addEventListener('visibilitychange', update);
@@ -142,6 +143,7 @@ export default function GlassCardMaterial({animated = false, variant = 0}: {anim
   return <div ref={container} className="prod-glass-material" aria-hidden="true" style={{position: "absolute", inset: 0, borderRadius: 'inherit', pointerEvents: "none", zIndex: 0}}>
     {inView && supported ? <MaterialFallback>
       <Canvas orthographic camera={{position: [0, 0, 10], manual: true, near: .1, far: 30}}
+        events={decorativeGlassEvents}
         resize={{scroll: false, debounce: {scroll: 0, resize: 50}, offsetSize: true}}
         frameloop="demand" dpr={variant ? 1 : [1, 1.5]} gl={{alpha: true, antialias: true, toneMapping: LinearToneMapping, toneMappingExposure: 1.3}}
         fallback={<FrostedFallback />}>
