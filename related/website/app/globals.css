@@ -234,7 +234,8 @@
 .lumiq-root .news-card h2 { font-size: 2.5rem; margin-bottom: 1rem; color: var(--ink); }
 .lumiq-root .news-card p { color: var(--ink-2); }
 
-.lumiq-root .footer { background: #FFFFFF; border-top: 1px solid var(--border); color: var(--ink-2); padding: 5rem 0 2rem; }
+/* Keep footer content above isolated, fixed page background compositors in Safari. */
+.lumiq-root .footer { position: relative; z-index: 1; background: #FFFFFF; border-top: 1px solid var(--border); color: var(--ink-2); padding: 5rem 0 2rem; }
 .lumiq-root .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 2rem; margin-bottom: 4rem; }
 .lumiq-root .foot-logo { display: flex; align-items: center; margin-bottom: 1.25rem; }
 .lumiq-root .foot-logo-img { height: 36px; width: auto; display: block; }
@@ -708,7 +709,4 @@
   min-width: 720px;
 }
 
-/* Word reveals never move the surrounding text layout. */
-[data-word-pending] { opacity: 0 !important; }
-.scroll-word { display: inline-block; }
-@media (prefers-reduced-motion: reduce) { [data-word-pending] { opacity: 1 !important; } }
+/* Reveals preserve the original text layout in every language. */

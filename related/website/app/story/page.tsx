@@ -1,3 +1,4 @@
+import Heading from "@/components/Heading";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -33,9 +34,9 @@ export default function StoryPage() {
       <section className="container story-hero">
         <div className="story-hero-copy reveal">
           <span className="kicker">{t("eyebrow")}</span>
-          <h1 className="serif">
+          <Heading as="h1" className="serif">
             {t("titleBefore")} <em>{t("titleEm")}</em>
-          </h1>
+          </Heading>
           <p>{t("origin1")}</p>
         </div>
 
@@ -65,7 +66,7 @@ export default function StoryPage() {
           <div className="story-section-head reveal">
             <div>
               <span className="kicker">{t("principlesEyebrow")}</span>
-              <h2 className="serif">{t("principlesTitle")}</h2>
+              <Heading as="h2" className="serif">{t("principlesTitle")}</Heading>
             </div>
           </div>
           <div className="story-principle-grid">
@@ -74,7 +75,7 @@ export default function StoryPage() {
                 <span className="story-principle-num serif">
                   {principle.n}
                 </span>
-                <h3 className="serif">{principle.title}</h3>
+                <Heading as="h3" className="serif">{principle.title}</Heading>
                 <p>{principle.body}</p>
               </article>
             ))}
@@ -94,7 +95,7 @@ export default function StoryPage() {
         <div className="story-section-head reveal">
           <div>
             <span className="kicker">{t("timelineEyebrow")}</span>
-            <h2 className="serif">{t("timelineTitle")}</h2>
+            <Heading as="h2" className="serif">{t("timelineTitle")}</Heading>
           </div>
         </div>
         <ol className="story-timeline-grid">
@@ -103,7 +104,7 @@ export default function StoryPage() {
               <span className="story-milestone-year serif">
                 {milestone.year}
               </span>
-              <h3>{milestone.title}</h3>
+              <Heading as="h3">{milestone.title}</Heading>
               <p>{milestone.body}</p>
             </li>
           ))}
@@ -114,7 +115,7 @@ export default function StoryPage() {
         <div className="container story-future-grid">
           <div className="story-future-copy">
             <span className="kicker">{t("futureEyebrow")}</span>
-            <h2 className="serif">{t("futureTitle")}</h2>
+            <Heading as="h2" className="serif">{t("futureTitle")}</Heading>
             <p>{t("future1")}</p>
             <p>{t("future2")}</p>
             <Link href="/products" className="btn btn-navy story-cta">

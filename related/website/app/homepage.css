@@ -1115,12 +1115,6 @@ html:has(.lh-home) {
   border-top: 1px solid #dce0e3;
   padding-top: 60px;
 }
-.lumiq-root:has(.lh-home) > .footer .foot-grid {
-  grid-template-columns: 1.3fr 1fr 1fr 1fr;
-}
-.lumiq-root:has(.lh-home) > .footer .foot-nav:last-child {
-  display: none;
-}
 .lumiq-root:has(.lh-home) > .footer h4 {
   font-family: "Lumiq Manrope", sans-serif;
 }
@@ -1558,13 +1552,6 @@ html:has(.lh-home) {
   }
   .lh-home .lh-consent {
     font-size: 13px;
-  }
-  .lumiq-root:has(.lh-home) > .footer .foot-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 36px 24px;
-  }
-  .lumiq-root:has(.lh-home) > .footer .foot-grid > div:first-child {
-    grid-column: 1/-1;
   }
 }
 @media (max-width: 520px) {

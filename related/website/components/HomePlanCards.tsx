@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
@@ -71,7 +73,7 @@ export default function PlanCards() {
           </div>
           <div className="hardware-plan-copy">
             <p className="eyebrow">{plan.type}</p>
-            <h3>{plan.name}</h3>
+            <Heading as="h3">{plan.name}</Heading>
             <p>{plan.description}</p>
             <div className="hardware-plan-purchase">
               <p className={plan.price === null ? "is-pending" : undefined}>

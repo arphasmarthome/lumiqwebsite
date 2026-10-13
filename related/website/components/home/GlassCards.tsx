@@ -1,11 +1,13 @@
 "use client";
+import Heading from "@/components/Heading";
+
 import { chapterImage } from "./HomeBackgrounds";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Environment, Html, Lightformer, MeshTransmissionMaterial, useFBO } from "@react-three/drei";
-import { CanvasTexture, ExtrudeGeometry, Group, MathUtils, NoToneMapping, PerspectiveCamera, ShaderMaterial, Shape, SRGBColorSpace, Texture, TextureLoader, VideoTexture } from "three";
+import { CanvasTexture, ExtrudeGeometry, Group, MathUtils, NoToneMapping, PerspectiveCamera, ShaderMaterial, Shape, SRGBColorSpace, Texture, TextureLoader, VideoTexture, Vector3 } from "three";
 import "@/app/[locale]/glass-preview/preview.css";
 import copyStyles from "./ProductCardCopy.module.css";
 
@@ -222,12 +224,14 @@ function GlassCard({ geometry, index, product, offset, five, active, select, hov
   geometry: ExtrudeGeometry; index: number; product: GlassProduct; offset: number; five: boolean; active: boolean; select: (index: number) => void; hover: (index: number | null) => void; sideView: boolean; content: boolean; buffer: Texture; pointer: CardPointer; reflected?: boolean;
 }) {
   const group = useRef<Group>(null);
+  const copySurface = useRef<HTMLDivElement>(null);
+  const projected = useMemo(() => [new Vector3(), new Vector3(), new Vector3()], []);
   const targetX = five ? Math.sign(offset) * ([0, 3.8, 6.6][Math.abs(offset)] ?? 6.6) : offset * 3.55;
   const targetScale = five ? [1.2, .7, .66][Math.abs(offset)] : active ? 1 : .9;
   const opacity = five && !active ? .7 : 1;
   const initialX = useRef(targetX);
   const previousOffset = useRef(offset);
-  useFrame((_, delta) => {
+  useFrame(({camera, size}, delta) => {
     if (!group.current) return;
     const angle = sideView ? .82 : offset > 0 ? -.28 : .28;
     // A wrapped item re-enters at the opposite edge, never travelling across the foreground.
@@ -248,6 +252,18 @@ function GlassCard({ geometry, index, product, offset, five, active, select, hov
     group.current.updateMatrix();
     const m = group.current.matrix.elements;
     group.current.position.y = -2.28 + Math.abs(m[1]) * 1.625 + Math.abs(m[5]) * 2.325 + Math.abs(m[9]) * .125;
+    if (copySurface.current) {
+      // Keep the glass in WebGL, but project readable DOM copy with a flat matrix.
+      // Safari can misplace/omit text inside Html's nested CSS perspective layers.
+      group.current.updateWorldMatrix(true, false);
+      const [origin, x, y] = projected;
+      origin.set(0, 0, .3).applyMatrix4(group.current.matrixWorld).project(camera);
+      x.set(1, 0, .3).applyMatrix4(group.current.matrixWorld).project(camera);
+      y.set(0, -1, .3).applyMatrix4(group.current.matrixWorld).project(camera);
+      const a=(x.x-origin.x)*size.width/200, b=-(x.y-origin.y)*size.height/200;
+      const c=(y.x-origin.x)*size.width/200, d=-(y.y-origin.y)*size.height/200;
+      copySurface.current.style.transform=`matrix(${a},${b},${c},${d},${-142.5*a-210*c},${-142.5*b-210*d})`;
+    }
   });
   // Keep the beveled bottom on the reflecting floor at either card scale.
   return <group ref={group} position={[initialX.current, 0, 0]} visible={Math.abs(offset) <= (five ? 2 : 1)}>
@@ -266,12 +282,12 @@ function GlassCard({ geometry, index, product, offset, five, active, select, hov
         transmission={1} roughness={active ? .7 : .38} ior={1.65} transparent opacity={(reflected ? .45 : 1) * opacity}
         clearcoat={1} clearcoatRoughness={.045} attenuationColor="#dcd5ea" attenuationDistance={2.5}
         chromaticAberration={0} anisotropicBlur={0} distortion={0}
-        samples={16} resolution={512} backsideResolution={256} color="#ffffff" />
+        samples={6} resolution={512} backsideResolution={256} color="#ffffff" />
     </mesh>
     <PearlFlow index={index} reflected={reflected} opacity={opacity} active={active} />
     {content && <CardArtwork product={product} active={active} reflected={reflected} opacity={opacity} hideLabel={five && !reflected && Boolean(product.body)} />}
-    {content && !reflected && Math.abs(offset) <= (five ? 2 : 1) && <Html transform position={[0, 0, .16]} distanceFactor={4}>
-      <div className={`glass-sample-content ${copyStyles.surface}`} onMouseEnter={() => hover(index)}
+    {content && !reflected && Math.abs(offset) <= (five ? 2 : 1) && <Html position={[0, 0, .3]} zIndexRange={[20, 10]}>
+      <div ref={copySurface} className={`glass-sample-content ${copyStyles.surface}`} onMouseEnter={() => hover(index)}
         onPointerMove={e => {
           if (e.pointerType === "touch") return;
           const rect = e.currentTarget.getBoundingClientRect();
@@ -400,7 +416,7 @@ function PearlFlow({ index, reflected, opacity, active }: { index: number; refle
 export function GlassCanvas({ selected, select, products = demoProducts, sideView = false, content = true, carousel = false, running = true }: {
   selected: number; select: (index: number) => void; products?: GlassProduct[]; sideView?: boolean; content?: boolean; carousel?: boolean; running?: boolean;
 }) {
-  return <Canvas frameloop={running ? "always" : "never"} camera={{ position: [0, 1.3, 36], fov: 12, near: .1, far: 100 }} dpr={[1, 1.5]}
+  return <Canvas frameloop={running ? "always" : "never"} camera={{ position: [0, 1.3, 36], fov: 12, near: .1, far: 100 }} dpr={[1, 1.25]}
     gl={{ antialias: true, alpha: true, toneMapping: NoToneMapping }} fallback={<p>此样板需要启用 WebGL 的浏览器。</p>}>
     {!carousel && <color attach="background" args={["#f5f3f9"]} />}
     <Suspense fallback={null}><GlassScene selected={selected} select={select} sideView={sideView} content={content} products={products} carousel={carousel} /></Suspense>
@@ -412,7 +428,7 @@ export default function GlassPreview() {
   const [sideView, setSideView] = useState(false);
   const [content, setContent] = useState(true);
   return <main className="glass-preview">
-    <header><p>材质样板 · 尚未替换首页</p><h1>玻璃、微光与倒影。</h1>
+    <header><p>材质样板 · 尚未替换首页</p><Heading as="h1">玻璃、微光与倒影。</Heading>
       <p>选中 70% 磨砂 · 未选中 38% 磨砂。悬停或点击切换。</p></header>
     <div className="glass-preview-controls">
       {demoProducts.map((p, i) => <button key={p.name} aria-pressed={selected === i} onClick={() => select(i)}>{p.name}</button>)}

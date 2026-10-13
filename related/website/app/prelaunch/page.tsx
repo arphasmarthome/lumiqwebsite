@@ -1,4 +1,6 @@
 "use client";
+import Heading from "@/components/Heading";
+
 import {Link} from "@/i18n/navigation";
 import {useTranslations} from "next-intl";
 import { useRef, useState } from "react";
@@ -63,9 +65,9 @@ export default function PrelaunchPage() {
       </div>
       <section className="container" style={{ padding: "4rem 2rem", maxWidth: 760, textAlign: "center" }}>
         <span className="kicker" style={{ justifyContent: "center" }}>{t("eyebrow")}</span>
-        <h1 className="lq-h1 serif" style={{ margin: "1rem 0 1.25rem", color: "var(--ink)" }}>
+        <Heading as="h1" className="lq-h1 serif" style={{ margin: "1rem 0 1.25rem", color: "var(--ink)" }}>
           {t("title")}
-        </h1>
+        </Heading>
         <p className="lq-body" style={{ color: "var(--ink-3)", maxWidth: 520, margin: "0 auto 2.5rem" }}>
           {t("intro")}
         </p>

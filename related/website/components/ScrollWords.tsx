@@ -2,96 +2,63 @@
 import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 
-/** Temporary word spans retain React's original text nodes for safe updates and navigation. */
+/** Whole-block entry: never split text, change kerning or alter CJK line breaks. */
 export default function ScrollWords() {
   const pathname = usePathname();
   useLayoutEffect(() => {
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     if (reduced.matches) return;
-    const root = document.querySelector("main");
-    if (!root) return;
     const seen = new WeakSet<Element>();
-    const waiting = new Set<HTMLElement>();
-    const cleanups = new Set<() => void>();
-    let frame = 0;
-    const segmenter = new Intl.Segmenter(document.documentElement.lang || "en", { granularity: "word" });
-    const reveal = (element: HTMLElement) => {
-      waiting.delete(element);
-      observer.unobserve(element);
-      const label = element.getAttribute("aria-label");
-      element.setAttribute("aria-label", element.textContent || "");
-      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-      const nodes: Text[] = [];
-      while (walker.nextNode()) nodes.push(walker.currentNode as Text);
-      const words: HTMLSpanElement[] = [];
-      const restore: (() => void)[] = [];
-      for (const node of nodes) {
-        const text = node.data;
-        if (!text.trim()) continue;
-        const fragment = document.createDocumentFragment();
-        const inserted: Node[] = [];
-        for (const part of segmenter.segment(text)) {
-          if (!part.isWordLike && part.segment.trim() && inserted.length && inserted.at(-1)?.textContent?.trim()) {
-            inserted.at(-1)!.textContent += part.segment;
-            continue;
-          }
-          const span = document.createElement("span");
-          span.textContent = part.segment;
-          span.setAttribute("aria-hidden", "true");
-          if (part.segment.trim()) { span.className = "scroll-word"; words.push(span); }
-          fragment.append(span); inserted.push(span);
-        }
-        node.before(fragment); node.data = "";
-        restore.push(() => { inserted.forEach(n => n.parentNode?.removeChild(n)); if (!node.data) node.data = text; });
-      }
-      const step = Math.min(65, 1100 / Math.max(1, words.length - 1));
-      const animations = words.map((word, i) => word.animate([
-        { opacity: 0, transform: "translateY(.8em)" },
-        { opacity: 1, transform: "translateY(0)" },
-      ], { duration: 950, delay: i * step, easing: "cubic-bezier(.25,.65,.25,1)", fill: "both" }));
-      // Reveal the container only after every delayed word has its initial pose.
-      element.removeAttribute("data-word-pending");
-      const cleanup = () => {
-        animations.forEach(a => a.cancel()); restore.forEach(fn => fn());
-        if (label === null) element.removeAttribute("aria-label"); else element.setAttribute("aria-label", label);
-        cleanups.delete(cleanup);
-      };
-      cleanups.add(cleanup);
-      Promise.all(animations.map(a => a.finished.catch(() => {}))).then(() => { if (cleanups.has(cleanup)) cleanup(); });
+    const animations = new Set<Animation>();
+    const pending = new Set<HTMLElement>();
+    const canReveal = (element: HTMLElement) => {
+      const main = element.closest<HTMLElement>("main");
+      return main && (!main.dataset.homeState || main.dataset.homeState === "open") &&
+        !document.querySelector('.lh-loader:not([data-state="hidden"])');
     };
-    const tick = () => {
-      frame = 0;
-      for (const element of waiting) {
-        if (!element.isConnected) { waiting.delete(element); continue; }
-        // Pinned opening copy can intersect the viewport before its parent becomes visible.
-        let visible = true;
-        for (let parent: HTMLElement | null = element; parent; parent = parent.parentElement) {
-          const style = getComputedStyle(parent);
-          if (parent.inert || style.visibility === "hidden" || (parent !== element && Number(style.opacity) < .15)) { visible = false; break; }
-        }
-        if (visible) reveal(element);
-      }
-      if (waiting.size) frame = requestAnimationFrame(tick);
+    const reveal = (element: HTMLElement) => {
+      if (!canReveal(element)) return;
+      observer.unobserve(element);
+      pending.delete(element);
+      element.removeAttribute("data-scroll-reveal");
+      const animation = element.animate([
+        { opacity: 0, transform: "translateY(24px)" },
+        { opacity: 1, transform: "translateY(0px)" },
+      ], { duration: 650, easing: "cubic-bezier(.23,1,.32,1)" });
+      animations.add(animation);
+      void animation.finished.catch(() => {}).then(() => animations.delete(animation));
     };
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
-        const element = entry.target as HTMLElement;
-        if (entry.isIntersecting) waiting.add(element); else waiting.delete(element);
+        if (!entry.isIntersecting) continue;
+        reveal(entry.target as HTMLElement);
       }
-      if (waiting.size && !frame) frame = requestAnimationFrame(tick);
-    }, { rootMargin: "0px 0px -10% 0px", threshold: .05 });
-    const scan = () => root.querySelectorAll<HTMLElement>("h1,h2,h3,h4,p").forEach(element => {
-      if (seen.has(element) || !element.textContent?.trim() || element.closest("button, a, form, [aria-live], .lh-loading, .glass-sample-content, [data-no-word-reveal]") || element.querySelector("a,button,input")) return;
-      seen.add(element); element.setAttribute("data-word-pending", ""); observer.observe(element);
-    });
-    // Observe inserted route/carousel content, but never our own temporary word wrappers.
+    }, { threshold: 0, rootMargin: "0px 0px -80px 0px" });
+    const scan = () => {
+      // Next can replace/stream main after this persistent layout effect runs.
+      // Observe the document shell, not the old route's detached main element.
+      document.querySelectorAll<HTMLElement>("main h1,main h2,main h3,main h4,main p").forEach(element => {
+        if (seen.has(element) || !element.textContent?.trim() || element.closest("button,a,form,[aria-live],.lh-loading,.glass-sample-content,[data-no-word-reveal],.lh-opening") || element.querySelector("a,button,input")) return;
+        seen.add(element);
+        const rect = element.getBoundingClientRect();
+        // Above-fold copy is readable immediately; only upcoming content is staged.
+        if (rect.bottom <= 0 || (rect.top < innerHeight - 80 && canReveal(element))) return;
+        element.setAttribute("data-scroll-reveal", "pending");
+        pending.add(element); observer.observe(element);
+      });
+      for (const element of pending) {
+        const rect = element.getBoundingClientRect();
+        if (!element.isConnected) { observer.unobserve(element); pending.delete(element); }
+        else if (rect.top < innerHeight - 80 && rect.bottom > 0) reveal(element);
+      }
+    };
     const mutation = new MutationObserver(scan);
-    mutation.observe(root, { childList: true, subtree: true });
+    mutation.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-home-state", "data-state"] });
     scan();
     const stop = () => {
-      observer.disconnect(); mutation.disconnect(); cancelAnimationFrame(frame);
-      cleanups.forEach(fn => fn());
-      root.querySelectorAll("[data-word-pending]").forEach(e => e.removeAttribute("data-word-pending"));
+      observer.disconnect(); mutation.disconnect();
+      animations.forEach(animation => animation.cancel()); animations.clear();
+      pending.forEach(element => element.removeAttribute("data-scroll-reveal")); pending.clear();
     };
     reduced.addEventListener("change", stop, { once: true });
     return () => { reduced.removeEventListener("change", stop); stop(); };

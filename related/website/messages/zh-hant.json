@@ -1,4 +1,15 @@
 {
+  "Members": {
+    "nav": "會員專區", "title": "陪伴，從這裡延續。", "intro": "在同一個地方整理你的設備、設定和創作，讓日常使用更順手。",
+    "preview": "前端預覽", "previewNotice": "此頁為功能與設計預覽。尚未接入會員登入、訂單或設備服務；資料只留在這個瀏覽器，不會同步或送出。",
+    "visitor": "訪客", "localOnly": "僅此瀏覽器", "devices": "我的設備", "profile": "個人設定", "membership": "會員方案", "portfolio": "作品投稿", "feedback": "建議與投訴", "help": "需要幫忙？",
+    "noDevices": "還沒有已連結的設備", "noDevicesBody": "正式上線後，已購買的設備會在登入後顯示。現在可以查看演示，試用設備設定。", "showDemo": "查看演示設備", "demoDevice": "演示設備", "notConnected": "未連接實際設備", "demoNotice": "演示設備不是購買紀錄。設定僅供預覽，不會更動實際設備。",
+    "settings": "設定", "deviceSettings": "設備設定", "deviceName": "設備名稱", "quiet": "夜間安靜模式（演示）", "deviceNotice": "設備名稱與開關會留在這個瀏覽器；正式控制需接入設備後台。", "saveSettings": "儲存設定", "close": "取消", "saved": "設定已儲存在這個瀏覽器。", "storageError": "瀏覽器無法儲存資料。請允許本地儲存後重試。", "explore": "認識其他 LUMIQ 產品",
+    "displayName": "顯示名稱", "displayNamePlaceholder": "想讓我們怎麼稱呼你？", "notifications": "接收產品消息（演示）", "profileNotice": "此處不會建立帳號，也不會寄送通知。登入與通知服務尚待接入。",
+    "notActivated": "尚未啟用", "planTitle": "找到適合你的陪伴方式", "planBody": "會員方案、設備權益與到期資訊會在服務接入後顯示。你可以瀏覽現有方案說明，這裡不會啟用訂閱或扣款。", "viewPlans": "查看方案", "noPayment": "預覽不包含購買或付款功能。",
+    "chooseCover": "選擇作品封面", "coverPreview": "作品封面本地預覽", "workTitle": "作品名稱", "workNotice": "封面只在當前頁面預覽，不會上傳。作品名稱可存為本地草稿；重新整理後需再次選擇封面。正式投稿需接入帳號與審核流程。", "workSaved": "作品名稱已存為本地草稿，未投稿。", "fileError": "請選擇 10 MB 以內的 PNG、JPEG 或 WebP 圖片。",
+    "feedbackType": "類型", "suggestion": "建議", "complaint": "投訴", "content": "內容", "feedbackNotice": "請勿填寫密碼、付款資料或其他敏感資訊。目前只儲存草稿，不會送交客服。", "saveDraft": "儲存草稿", "draftSaved": "草稿已儲存在這個瀏覽器，未送交客服。", "contact": "聯絡我們"
+  },
   "HomeRefresh": {
     "loading": {
       "label": "正在準備與你的相遇",
@@ -604,6 +615,11 @@
     "conceptNotice": "概念規格——最終功能、4G、位置、碰撞偵測與 SOS 有待品牌確認。",
     "relationshipEyebrow": "與 Lumiq Ola 一起設計",
     "relationshipTitle": "在家有 Ola，出門有 Ola Go。",
+    "scenesTitle": "日常所需，隨手可及。",
+    "connectedTitle": "保持聯繫，安心同行。",
+    "connectedIntro": "了解 Ola Go 的連線與安全概念。各項功能及服務範圍仍待品牌方確認。",
+    "closingTitle": "認識你的隨身夥伴。",
+    "closingBody": "Ola Go 規劃隨 LUMIQ OLA 提供。加入候補名單，接收產品開放的最新消息。",
     "relationshipBody": "Ola Go 目前規劃為隨產品提供，不單獨出售。",
     "remindersTitle": "隨身提醒",
     "remindersBody": "離家後攜帶日常提醒的概念。",

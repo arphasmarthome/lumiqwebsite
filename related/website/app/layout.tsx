@@ -6,8 +6,10 @@ import "./navigation.css";
 import "./site-typography.css";
 import "./mobile.css";
 import "./section-spacing.css";
+import "./brand-review-20261009.css";
+import "./stable-page-backgrounds.css";
+import "./cart.css";
 import {htmlLang, type Locale} from "@/i18n/routing";
-import ExternalFonts from "@/components/ExternalFonts";
 
 export const metadata: Metadata = {
   title: {
@@ -34,8 +36,10 @@ export default async function RootLayout({
 
   return (
     <html lang={htmlLang[locale] ?? "en"} suppressHydrationWarning>
+      <head>
+        <link rel="preload" href="/assets/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
       <body>
-        <ExternalFonts />
         {children}
       </body>
     </html>
