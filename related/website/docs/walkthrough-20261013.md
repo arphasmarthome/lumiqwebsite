@@ -6,7 +6,18 @@
 
 程式碼：[甲方倉庫合併請求 #2](https://github.com/arphasmarthome/lumiqwebsite/pull/2)。本次提交接續原分支歷史，不強制推送，也不直接合併 main。
 
-## 本次實測
+## 購物車位移：本次補充複測
+
+真實 Safari 開啟購物車時，原本 1423px 的內容寬度變成 1440px，導航因此向右移動 8.5px。修復後保留捲動條占位，開關購物車不再改變背景位置；側欄仍貼齊視窗右側。
+
+| 檢查項目 | 本次範圍 | 結果 |
+| --- | --- | --- |
+| 購物車開關位置、背景捲動鎖定、側欄貼邊 | Chromium／Firefox／WebKit × 三語 × 首頁／平板詳情／會員專區 × 320、768、1440、2560px；點擊、關閉按鈕、Escape | 108 組通過，未發現位置改變、裁切或 pageerror |
+| 真實 Safari 開关位置及側欄貼邊 | Safari 26.6.2 × 三語 × 上述三頁 × 500、1043、1440、2435px | 36 組通過；以頁面事件開啟彈層，檢查原生 dialog 與繪製位置，不代替真機觸控驗收 |
+| 購物車既有功能回歸 | 三引擎、三語、320–2560px，數量、移除、本機保存、鍵盤操作及減少動態效果 | 60 項通過 |
+| 單元測試與正式構建 | 11 個測試檔、Next.js 型別檢查及 89 個頁面生成 | 63 項測試通過，正式構建成功；既有未使用變數警告不變 |
+
+## 上一輪全站實測
 
 測試使用正式構建，涵蓋英文、繁體中文、日文；主要頁面為首頁、產品總覽、五款產品詳情、品牌故事、方案、FAQ、會員專區。
 
@@ -31,8 +42,8 @@
 | 系統／設備 | 測試方式 | 結論與限制 |
 | --- | --- | --- |
 | 本機 macOS | 真實 Safari 26.6.2；Chrome、Firefox；Chromium／Firefox／WebKit 自動測試 | 上述排版及購物車矩陣通過；Safari 單獨檢查首屏與三語各頁頁尾 |
-| Windows、Linux | 甲方倉庫 GitHub Actions；Windows 另含 Edge | [上一輪已通過](https://github.com/arphasmarthome/lumiqwebsite/actions/runs/38347417385)；最後事件绑定補丁另提交複測，結果以 PR 檢查為準 |
-| 雲端 macOS | GitHub Actions Chromium／Firefox／WebKit | 上一輪 Firefox 在產品總覽由超寬切換手機尺寸時超時；WebKit 記錄三次空目標事件監聽異常。已縮減屏邊預渲染並移除裝飾 Canvas 不需要的事件綁定，本機複測通過；雲端仍須驗證，不能標記全部通過 |
+| Windows、Linux | 甲方倉庫 GitHub Actions；Windows 另含 Edge | [上一輪已通過](https://github.com/arphasmarthome/lumiqwebsite/actions/runs/38349322785)；本次購物車補丁另提交回歸，結果以 PR 檢查為準 |
+| 雲端 macOS | GitHub Actions Chromium／Firefox／WebKit | [上一輪](https://github.com/arphasmarthome/lumiqwebsite/actions/runs/38349322785) Chromium 297 項、WebKit 297 項無失敗；Firefox 在繁中產品總覽 320px 階段超時，原因尚未確定。本次購物車修復不代表該問題已解決，不能標記全部通過 |
 | iPhone／Android | 手機尺寸、觸控配置及 WebKit／Chromium 引擎模擬 | 不等同真機；低階設備、電池省電模式與行動網路仍需實機驗證 |
 | Opera、Brave 及其他 Chromium 瀏覽器 | 未使用各品牌瀏覽器實測 | 引擎相同不代表已完成品牌瀏覽器驗收 |
 

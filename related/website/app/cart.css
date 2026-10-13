@@ -1,9 +1,11 @@
 /* Cart colors stay local: product pages keep their approved dark-background text. */
+/* Keep the viewport width unchanged when the modal locks body scrolling. */
+html:has(.cart-drawer) { scrollbar-gutter: stable; }
 .cart-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .lumiq-root .site-nav .cart-nav-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 42px; width: 42px; height: 44px; padding: 0; border: 0; border-radius: 50%; color: #182b41; background: transparent; cursor: pointer; }
 .cart-nav-trigger svg { display: block; pointer-events: none; }
 .cart-nav-count { position: absolute; top: 0; right: -3px; display: grid; place-items: center; min-width: 18px; height: 18px; padding-inline: 3px; border-radius: 999px; color: #fff; background: #263b51; font: 700 10px/1 var(--font-sans, sans-serif); }
-.cart-drawer { position: fixed; inset: 0 0 0 auto; width: min(480px, 100vw); max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; overflow: hidden; border: 1px solid rgb(255 255 255 / 70%); border-radius: 26px 0 0 26px; color: #182b41; background: #f4f6fc; box-shadow: -18px 0 70px rgb(15 28 45 / 18%); font-family: var(--font-sans, sans-serif); }
+.cart-drawer { position: fixed; inset: 0 0 0 auto; right: calc(100% - 100vw); width: min(480px, 100vw); max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; overflow: hidden; border: 1px solid rgb(255 255 255 / 70%); border-radius: 26px 0 0 26px; color: #182b41; background: #f4f6fc; box-shadow: -18px 0 70px rgb(15 28 45 / 18%); font-family: var(--font-sans, sans-serif); }
 .cart-drawer::backdrop { background: rgb(13 23 38 / 38%); }
 .cart-panel { display: flex; flex-direction: column; height: 100%; min-height: 0; background: radial-gradient(ellipse at 100% 0, #e8ecff99, transparent 48%), linear-gradient(160deg, #ffffffa3, #f3f6fb); }
 .cart-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: max(28px, env(safe-area-inset-top)) 28px 20px; border-bottom: 1px solid #172b4014; }
