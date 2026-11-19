@@ -1,3 +1,4 @@
+import Heading from "@/components/Heading";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -18,7 +19,7 @@ export default function NotFound() {
         >
           Lost in the story
         </span>
-        <h1
+        <Heading as="h1"
           className="serif"
           style={{
             fontSize: "clamp(5rem, 15vw, 8rem)",
@@ -29,8 +30,8 @@ export default function NotFound() {
           }}
         >
           404<span style={{ color: "var(--gold)" }}>.</span>
-        </h1>
-        <h2
+        </Heading>
+        <Heading as="h2"
           className="serif"
           style={{
             marginTop: "1rem",
@@ -39,7 +40,7 @@ export default function NotFound() {
           }}
         >
           This page wandered off.
-        </h2>
+        </Heading>
         <p
           style={{
             marginTop: "0.6rem",

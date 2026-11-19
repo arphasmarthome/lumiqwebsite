@@ -1,15 +1,11 @@
-/** Start the whole upcoming scene, including horizontally hidden products and
- * inactive family images, before it reaches the viewport. Native lazy loading
- * cannot reliably predict a pinned/transformed scene's future position. */
-export function preloadScenes(root: HTMLElement) {
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      entry.target.querySelectorAll<HTMLImageElement>("img[data-home-image]")
-        .forEach(image => { image.loading = "eager"; });
-      observer.unobserve(entry.target);
-    }
-  }, { rootMargin: "1800px 0px" });
-  root.querySelectorAll("[data-home-section]").forEach(section => observer.observe(section));
-  return () => observer.disconnect();
+/** Current/nearby artwork takes precedence over other-page warmup. Recheck
+ * after scrolling; failed images must not block future prefetches forever. */
+export function hasPendingHomeArtwork() {
+  return [...document.querySelectorAll<HTMLImageElement>('.lh-home img[data-home-image]')].some(image => {
+    if (image.complete || image.dataset.homeImageState === 'error') return false;
+    const bounds = image.getBoundingClientRect();
+    if (bounds.width <= 0 || bounds.height <= 0) return false;
+    return image.loading === 'eager' || image.fetchPriority === 'high' ||
+      (bounds.bottom > -1200 && bounds.top < innerHeight + 1200 && bounds.right > 0 && bounds.left < innerWidth);
+  });
 }

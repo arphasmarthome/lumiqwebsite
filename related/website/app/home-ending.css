@@ -74,11 +74,6 @@
   background: #f7f6f3;
   border-top-color: #d8dcdb;
 }
-.lumiq-root:has(.lh-home) > .footer .container {
-  width: min(calc(100% - clamp(24px, 5vw, 104px) * 2), 1480px);
-  max-width: none;
-  padding-inline: 0;
-}
 .lumiq-root:has(.lh-home) > .footer .foot-nav h4 {
   color: #596c79;
 }

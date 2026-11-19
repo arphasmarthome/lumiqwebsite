@@ -1,103 +1,213 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {homeWideQuery} from "./responsiveLayout";
+import {gsap} from "gsap";
+import {ScrollTrigger} from "gsap/ScrollTrigger";
 
-export const openingVideoSource = "/assets/home-video/ola-scroll-v16-20260909.mp4";
-export const openingVideoQuery =
-  "(min-width: 1101px) and (min-height: 600px) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+// Same approved film, short-GOP H.264 for bounded seeking on WebKit.
+export const openingVideoSource = "/assets/home-video/compat-20261008/ola-scroll-v16-scrub.mp4";
 
-/** One continuous shot, held at its approved first frame until the user scrolls. */
-export function mountOpeningVideo(root: HTMLElement) {
-  if (new URLSearchParams(window.location.search).get("opening") === "code") return () => {};
+/** Two real document anchors. A desktop wheel gesture completes one transition. */
+export function mountOpeningVideo(root: HTMLElement, source = openingVideoSource, posters?: string[]) {
   const opening = root.querySelector<HTMLElement>(".lh-opening")!;
-  const stage = opening.querySelector<HTMLElement>(".lh-opening-stage")!;
+  const hero = opening.querySelector<HTMLElement>("#top")!;
+  const companion = opening.querySelector<HTMLElement>("#ola")!;
+  const companionLayout = companion.querySelector<HTMLElement>(".lh-ola-layout")!;
   const video = opening.querySelector<HTMLVideoElement>(".lh-opening-video")!;
   const layer = opening.querySelector<HTMLElement>(".lh-video-layer")!;
-  const heroCopy = opening.querySelector<HTMLElement>(".lh-hero-copy")!;
-  const brandCopy = opening.querySelector<HTMLElement>(".lh-ola-copy")!;
-  const cards = opening.querySelector<HTMLElement>(".lh-rhythm-cards")!;
+  const posterLayers = [...layer.querySelectorAll<HTMLElement>(".lh-video-start-poster, .lh-video-end-poster")];
+  const previousPosters = posterLayers.map(element => element.style.backgroundImage);
+  posterLayers.forEach((element, index) => {
+    if (posters?.[index]) element.style.backgroundImage = `url(${JSON.stringify(posters[index])})`;
+  });
   const mm = gsap.matchMedia();
-  mm.add(openingVideoQuery, () => {
+  let initialLayout = true;
+  mm.add({desktop: homeWideQuery, motion: "(prefers-reduced-motion: no-preference)"}, context => {
+    const initial = initialLayout;
+    initialLayout = false;
+    if (!context.conditions?.desktop) return;
+    const motion = Boolean(context.conditions.motion);
+    const previousTransform = companionLayout.style.transform;
+    opening.dataset.openingAnchors = "true";
     opening.dataset.videoMode = "true";
-    layer.dataset.intro = "complete";
-    let alive = true;
+    if (!motion) opening.dataset.staticOpening = "true";
+    const chapters = [hero, companion];
+    const top = (index: number) => scrollY + chapters[index].getBoundingClientRect().top;
+    let tween: gsap.core.Tween | undefined;
+    let lastWheel = -Infinity;
+    let wheelDirection = 0;
+    let consumed = false;
+    let settled: number | null = null;
     let frame = 0;
-    const anchor = 0.92;
-    const playhead = { progress: 0 };
-    const duration = () => Number.isFinite(video.duration) ? video.duration : 6;
-    const endTime = () => Math.max(0, duration() - 1 / 30);
-    const tick = () => {
-      frame = 0;
-      if (!alive || document.hidden || video.error || video.readyState < 2 || video.seeking) return;
-      const desired = playhead.progress * endTime();
-      if (Math.abs(video.currentTime - desired) > 1 / 60) {
-        video.currentTime = desired;
+    let videoFrame = 0;
+    let presentedTime = -1;
+    let failed = false;
+    let mounted = true;
+    let progress = 0;
+    // The Go disc starts detaching after 3.75s of the approved 6.55s range.
+    const reveal = 3.75 / 6.55;
+    const duration = 1.3 * (1 + .4 * reveal);
+    const endTime = () => Number.isFinite(video.duration) ? Math.max(0, video.duration - 1 / 30) : 0;
+    const desiredTime = () => Math.min(endTime(), Math.round(progress * endTime() * 24) / 24);
+    const stop = () => { tween?.kill(); tween = undefined; };
+    const go = (index: number, animate: boolean) => {
+      stop();
+      settled = index;
+      if (!animate || !motion) {
+        window.scrollTo({top: top(index), behavior: "instant"});
+        schedule();
         return;
       }
-      layer.dataset.ready = "true";
+      const position = {y: scrollY};
+      const destination = top(index);
+      tween = gsap.to(position, {
+        y: destination, duration: duration * Math.abs(destination - scrollY) / (top(1) - top(0)), ease: "none",
+        onUpdate: () => window.scrollTo({top: position.y, behavior: "instant"}),
+        onComplete: () => { tween = undefined; settled = index; schedule(); },
+      });
     };
-    const schedule = () => { if (alive && !frame) frame = requestAnimationFrame(tick); };
-    const update = () => {
-      heroCopy.inert = playhead.progress > 0.4;
-      brandCopy.inert = cards.inert = playhead.progress < 0.43;
-      video.dataset.scrollProgress = String(playhead.progress);
+    const wheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.defaultPrevented || !event.deltaY || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+      if (event.target instanceof Element && event.target.closest('.site-nav, [role="dialog"], input, textarea, select, [contenteditable="true"]')) return;
+      const first = top(0), second = top(1);
+      const returning = event.deltaY < 0 && scrollY > second + 2 && scrollY < second + innerHeight;
+      if (scrollY < first - 2 || scrollY > second + 2 && !returning) return;
+      const direction = Math.sign(event.deltaY);
+      if (direction !== wheelDirection) {
+        stop();
+        consumed = false;
+      }
+      if (event.timeStamp - lastWheel > 280) consumed = false;
+      lastWheel = event.timeStamp;
+      wheelDirection = direction;
+      // Hold only the downward trackpad tail at screen two. Upward scrolling
+      // can continue through that anchor to the first screen without a click.
+      if (consumed || tween) { event.preventDefault(); return; }
+      if (direction > 0 && scrollY >= second - 2 || direction < 0 && scrollY <= first + 2) return;
+      event.preventDefault();
+      consumed = direction > 0;
+      go(returning || direction > 0 ? 1 : 0, true);
+    };
+    const key = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.target instanceof Element && event.target.closest('input, textarea, select, button, a, [contenteditable="true"], [role="dialog"]')) return;
+      const down = ["ArrowDown", "PageDown", " "].includes(event.key) && !event.shiftKey;
+      const up = ["ArrowUp", "PageUp", "Home"].includes(event.key) || event.key === " " && event.shiftKey;
+      if (!down && !up) { if (event.key === 'End') stop(); return; }
+      if (scrollY < top(0) - 2 || scrollY > top(1) + 2) return;
+      if (down && scrollY >= top(1) - 2 || up && scrollY <= top(0) + 2) return;
+      event.preventDefault();
+      consumed = false;
+      go(down ? 1 : 0, false);
+    };
+    const navigate = () => {
+      const index = location.hash === '#ola' ? 1 : location.hash === '#top' ? 0 : null;
+      stop(); consumed = false;
+      if (index !== null) go(index, false);
+    };
+    const pointer = () => { stop(); consumed = false; };
+    const resize = () => {
+      const index = settled;
+      stop();
+      // Navigation can move below the opening before its next scroll frame.
+      // Restore only an anchor whose chapter is still on screen.
+      if (index !== null) {
+        const bounds = chapters[index].getBoundingClientRect();
+        if (bounds.top < innerHeight && bounds.bottom > 0) go(index, false);
+      }
       schedule();
     };
-    const ready = () => { video.pause(); schedule(); };
-    const failed = () => { video.pause(); delete layer.dataset.ready; };
-    const visibility = () => {
-      if (document.hidden) video.pause();
-      else schedule();
+    const render = () => {
+      frame = 0;
+      if (!mounted) return;
+      const first = top(0), second = top(1);
+      const travel = second - first;
+      const scrollProgress = Math.max(0, Math.min(1, (scrollY - first) / Math.max(1, travel)));
+      if (motion) {
+        // Bring the whole second-screen layout in 1.4x faster, then let normal
+        // document flow carry it away with the film after the second anchor.
+        const offset = -travel * Math.min(.4 * scrollProgress, 1 - scrollProgress);
+        companionLayout.style.transform = offset ? `translate3d(0, ${offset}px, 0)` : previousTransform;
+      }
+      const elapsed = scrollProgress * duration;
+      const revealTime = 1.3 * reveal * 1.4;
+      // Scroll at constant speed; retime only the film's pre-reveal segment.
+      progress = elapsed <= revealTime ? elapsed / (1.3 * 1.4) : reveal + (elapsed - revealTime) / 1.3;
+      if (!tween) settled = Math.abs(scrollY - first) < 2 ? 0 : Math.abs(scrollY - second) < 2 ? 1 : null;
+      layer.dataset.poster = progress >= .5 ? 'end' : 'start';
+      if (!motion || failed || document.hidden) return;
+      video.dataset.scrollProgress = String(progress);
+      if (video.readyState < 1 || video.seeking) return;
+      const wanted = desiredTime();
+      if (Math.abs(video.currentTime - wanted) > 1 / 48) { video.currentTime = wanted; return; }
+      if (video.readyState >= 2 && (!video.requestVideoFrameCallback || Math.abs(presentedTime - wanted) < .1)) layer.dataset.ready = 'true';
     };
-    video.muted = true;
-    video.loop = false;
-    video.preload = "auto";
-    video.addEventListener("loadeddata", ready);
-    video.addEventListener("seeked", schedule);
-    video.addEventListener("canplay", schedule);
-    video.addEventListener("error", failed);
-    document.addEventListener("visibilitychange", visibility);
-    window.addEventListener("lumiq:home-enter", ready);
-    const source = video.dataset.preparedSrc || openingVideoSource;
-    if (video.getAttribute("src") !== source) { video.src = source; video.load(); }
-    const timeline = gsap.timeline({ scrollTrigger: {
-      id: "home-opening-video", trigger: stage, pin: stage, start: "top top",
-      end: () => `+=${window.innerHeight * 2.85}`, scrub: true,
-      invalidateOnRefresh: true, refreshPriority: 2, onRefresh: update,
-    } });
-    timeline
-      .to(playhead, { progress: 1, duration: anchor, ease: "none", onUpdate: update }, 0)
-      .to({}, { duration: 1 - anchor }, anchor)
-      .to(heroCopy, { autoAlpha: 0, y: -35, duration: 0.25, ease: "none" }, 0.05)
-      // Text shares the video's scroll timeline in both directions.
-      .fromTo(brandCopy, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.22, ease: "none" }, 0.42)
-      .fromTo(cards, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.22, ease: "none" }, 0.48);
-    const scroll = timeline.scrollTrigger!;
-    const resetFrame = requestAnimationFrame(() => {
-      ScrollTrigger.refresh();
-      if (window.location.hash === "#ola")
-        window.scrollTo({ top: scroll.start + (scroll.end - scroll.start) * anchor, behavior: "instant" });
-      scroll.update();
-      update();
-      ready();
-    });
-    update();
+    const schedule = () => { if (mounted && !frame) frame = requestAnimationFrame(render); };
+    const watchFrame = () => {
+      if (!video.requestVideoFrameCallback) return;
+      videoFrame = video.requestVideoFrameCallback((_time, metadata) => {
+        presentedTime = metadata.mediaTime;
+        schedule();
+        if (mounted && !failed) watchFrame();
+      });
+    };
+    const ready = () => { video.pause(); schedule(); };
+    const error = () => {
+      failed = true;
+      delete layer.dataset.ready;
+      video.pause();
+      // Keep both anchors and readable content when media decoding is unavailable.
+    };
+    const visibility = () => { video.pause(); if (!document.hidden) schedule(); };
+    window.addEventListener('wheel', wheel, {passive: false});
+    window.addEventListener('keydown', key);
+    window.addEventListener('hashchange', navigate);
+    window.addEventListener('popstate', navigate);
+    window.addEventListener('resize', resize);
+    window.addEventListener('pointerdown', pointer, {passive: true});
+    window.addEventListener('scroll', schedule, {passive: true});
+    if (motion) {
+      layer.dataset.intro = 'complete';
+      video.muted = true;
+      video.loop = false;
+      video.preload = 'auto';
+      for (const name of ['loadedmetadata', 'loadeddata', 'seeked', 'canplay']) video.addEventListener(name, ready);
+      video.addEventListener('error', error);
+      document.addEventListener('visibilitychange', visibility);
+      watchFrame();
+      video.src = source;
+      video.load();
+    }
+    // Layout now reserves exactly two viewports; there is no GSAP pin or scrub.
+    if (initial) navigate();
+    schedule();
+    ScrollTrigger.refresh();
     return () => {
-      alive = false;
-      cancelAnimationFrame(resetFrame);
+      mounted = false;
+      stop();
       cancelAnimationFrame(frame);
-      video.removeEventListener("loadeddata", ready);
-      video.removeEventListener("seeked", schedule);
-      video.removeEventListener("canplay", schedule);
-      video.removeEventListener("error", failed);
-      document.removeEventListener("visibilitychange", visibility);
-      window.removeEventListener("lumiq:home-enter", ready);
-      video.pause(); video.removeAttribute("src"); video.load();
+      if (videoFrame) video.cancelVideoFrameCallback(videoFrame);
+      window.removeEventListener('wheel', wheel);
+      window.removeEventListener('keydown', key);
+      window.removeEventListener('hashchange', navigate);
+      window.removeEventListener('popstate', navigate);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('pointerdown', pointer);
+      window.removeEventListener('scroll', schedule);
+      for (const name of ['loadedmetadata', 'loadeddata', 'seeked', 'canplay']) video.removeEventListener(name, ready);
+      video.removeEventListener('error', error);
+      document.removeEventListener('visibilitychange', visibility);
+      video.pause(); video.removeAttribute('src'); video.load();
       delete video.dataset.scrollProgress;
       delete opening.dataset.videoMode;
+      delete opening.dataset.staticOpening;
+      delete opening.dataset.openingAnchors;
       delete layer.dataset.ready;
       delete layer.dataset.intro;
-      heroCopy.inert = brandCopy.inert = cards.inert = false;
+      delete layer.dataset.poster;
+      companionLayout.style.transform = previousTransform;
     };
   });
-  return () => mm.revert();
+  return () => {
+    mm.revert();
+    posterLayers.forEach((element, index) => {element.style.backgroundImage = previousPosters[index];});
+  };
 }

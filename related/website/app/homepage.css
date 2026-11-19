@@ -165,7 +165,7 @@ html:has(.lh-home) {
   pointer-events: none;
   z-index: -1;
   inset: 0;
-  background: url("/assets/home-interactive/pearl-light.webp") center/cover
+  background: var(--cms-asset_b0fc987be9c43a11, url("/assets/home-interactive/pearl-light.webp")) center/cover
     no-repeat;
   mask-image: linear-gradient(180deg, #000 70%, transparent);
 }
@@ -363,11 +363,7 @@ html:has(.lh-home) {
   overflow: hidden;
 }
 .lh-rhythm-photo img {
-  object-fit: cover;
-  transition: transform 0.8s var(--lh-ease);
-}
-.lh-rhythm-card:hover .lh-rhythm-photo img {
-  transform: scale(1.035);
+  object-fit: contain;
 }
 .lh-rhythm-copy {
   padding: 22px 19px 26px;
@@ -1115,12 +1111,6 @@ html:has(.lh-home) {
   border-top: 1px solid #dce0e3;
   padding-top: 60px;
 }
-.lumiq-root:has(.lh-home) > .footer .foot-grid {
-  grid-template-columns: 1.3fr 1fr 1fr 1fr;
-}
-.lumiq-root:has(.lh-home) > .footer .foot-nav:last-child {
-  display: none;
-}
 .lumiq-root:has(.lh-home) > .footer h4 {
   font-family: "Lumiq Manrope", sans-serif;
 }
@@ -1160,9 +1150,7 @@ html:has(.lh-home) {
   }
 }
 @media (min-width: 2100px) {
-  .lh-hero {
-    min-height: 960px;
-  }
+  .lh-hero,
   .lh-hero-layout {
     min-height: 960px;
   }
@@ -1197,7 +1185,7 @@ html:has(.lh-home) {
     min-height: 48px;
   }
 }
-@media (max-width: 1100px) {
+@media (max-width: 1199px) {
   .lh-hero-layout {
     grid-template-columns: 44% 56%;
   }
@@ -1558,13 +1546,6 @@ html:has(.lh-home) {
   }
   .lh-home .lh-consent {
     font-size: 13px;
-  }
-  .lumiq-root:has(.lh-home) > .footer .foot-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 36px 24px;
-  }
-  .lumiq-root:has(.lh-home) > .footer .foot-grid > div:first-child {
-    grid-column: 1/-1;
   }
 }
 @media (max-width: 520px) {

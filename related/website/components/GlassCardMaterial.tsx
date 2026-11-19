@@ -6,6 +6,22 @@ import {Environment, Lightformer, MeshTransmissionMaterial} from "@react-three/d
 import {CanvasTexture, LinearToneMapping, OrthographicCamera, SRGBColorSpace} from "three";
 import {createPillowGeometry} from "@/lib/pillow-glass";
 import {glassFlowPhase} from "@/lib/glass-flow";
+import {decorativeGlassEvents, glassIsVisible} from "@/lib/glass-visibility";
+
+let webglAvailable: boolean | undefined;
+function canRenderGlass() {
+  if (webglAvailable !== undefined) return webglAvailable;
+  try {
+    const context = document.createElement('canvas').getContext('webgl2', {alpha: true, antialias: true, failIfMajorPerformanceCaveat: true});
+    const info = context?.getExtension('WEBGL_debug_renderer_info');
+    const renderer = info ? String(context?.getParameter(info.UNMASKED_RENDERER_WEBGL)) : '';
+    webglAvailable = !!context && !/swiftshader|llvmpipe|softpipe|software rasterizer|microsoft basic render/i.test(renderer);
+    context?.getExtension('WEBGL_lose_context')?.loseContext();
+  } catch {
+    webglAvailable = false;
+  }
+  return webglAvailable;
+}
 
 function paintStudio(canvas: HTMLCanvasElement, phase: number) {
   const context = canvas.getContext('2d')!;
@@ -101,31 +117,50 @@ class MaterialFallback extends Component<{children: ReactNode}, {failed: boolean
 }
 
 function FrostedFallback() {
-  return <div style={{position: 'absolute', inset: 0, borderRadius: 'inherit', background: 'rgba(237,240,245,.7)', backdropFilter: 'blur(30px)'}} />;
+  // Paint once: a software renderer should not redraw three transmission
+  // materials (or blur their moving backdrops) on every transition frame.
+  const surface = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    if (surface.current?.getContext('2d')) paintStudio(surface.current, 0);
+  }, []);
+  return <div style={{position:'absolute', inset:0, borderRadius:'inherit', overflow:'hidden',
+    background:'rgba(237,240,245,.68)', boxShadow:'inset 0 2px 5px #fff, inset 0 0 12px rgba(80,100,120,.19)'}}>
+    <canvas ref={surface} width={512} height={512} style={{display:'block', opacity:.55}} />
+  </div>;
 }
 
 export default function GlassCardMaterial({animated = false, variant = 0}: {animated?: boolean; variant?: number}) {
   const container = useRef<HTMLDivElement>(null);
   const [running, setRunning] = useState(false);
+  const [supported, setSupported] = useState(false);
+  const [inView, setInView] = useState(false);
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
     let visible = false;
     const update = () => setRunning(visible && !reduced.matches && !document.hidden);
-    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); });
+    // Keep the frosted fallback while offscreen. Three hidden transmission
+    // canvases otherwise allocate/reproject together on every viewport resize.
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = glassIsVisible(entry);
+      if (visible) setSupported(canRenderGlass());
+      setInView(visible);
+      update();
+    }, {rootMargin: '0px', threshold: [0, .2]});
     if (container.current) observer.observe(container.current);
     reduced.addEventListener('change', update);
     document.addEventListener('visibilitychange', update);
     return () => { observer.disconnect(); reduced.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); };
   }, []);
   return <div ref={container} className="prod-glass-material" aria-hidden="true" style={{position: "absolute", inset: 0, borderRadius: 'inherit', pointerEvents: "none", zIndex: 0}}>
-    <MaterialFallback>
+    {inView && supported ? <MaterialFallback>
       <Canvas orthographic camera={{position: [0, 0, 10], manual: true, near: .1, far: 30}}
-        resize={{scroll: false, debounce: 0, offsetSize: true}}
+        events={decorativeGlassEvents}
+        resize={{scroll: false, debounce: {scroll: 0, resize: 50}, offsetSize: true}}
         frameloop="demand" dpr={variant ? 1 : [1, 1.5]} gl={{alpha: true, antialias: true, toneMapping: LinearToneMapping, toneMappingExposure: 1.3}}
         fallback={<FrostedFallback />}>
         <GlassSlab running={running && animated} variant={variant} />
       </Canvas>
-    </MaterialFallback>
+    </MaterialFallback> : <FrostedFallback />}
     <style jsx global>{`
       .prod-glass-material canvas { width: 100% !important; height: 100% !important; }
       .prod-glass-material { filter: drop-shadow(0 12px 16px rgba(37,43,52,.16)); }

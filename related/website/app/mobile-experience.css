@@ -1,0 +1,93 @@
+
+@media (max-width: 767px) {
+  /* Reserve the lower artwork area after the actual copy height. Longer
+     translations can wrap actions without colliding with the brand artwork. */
+  .lumiq-root .lh-home .lh-hero { min-height: 0; padding-bottom: calc(112vw + 24px); }
+  .lumiq-root .lh-home .lh-hero .lh-actions { flex-wrap: wrap; }
+  .lumiq-root .hw-actions { flex-wrap: wrap; gap: 10px 14px; }
+  .lumiq-root .hw-actions .hw-reserve { flex: 0 0 auto; max-width: 100%; white-space: normal; text-align: center; }
+  .lumiq-root .lh-mobile-films { width: 100%; margin-top: 24px; }
+  .lh-mobile-films-track {
+    position: relative; display: flex; gap: 16px; width: 100%; overflow-x: auto;
+    padding: 4px 20px 16px; scroll-padding-inline: 20px; scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain; touch-action: auto; scrollbar-width: none;
+  }
+  .lh-mobile-films-track::-webkit-scrollbar { display: none; }
+  .lh-mobile-films-track::after { content: ''; flex: 0 0 16px; }
+  .lh-mobile-film-card { flex: 0 0 calc(100% - 16px); min-width: 0; scroll-snap-align: start; border-radius: 22px; overflow: hidden; border: 1px solid #fff; background: #ffffffb8; }
+  .lh-mobile-film-media { position: relative; aspect-ratio: 16 / 9; background: #e8e7ef; }
+  .lh-mobile-film-media :is(video, img) { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .lh-mobile-film-poster { display: block; width: 100%; height: 100%; padding: 0; border: 0; cursor: pointer; background: transparent; }
+  .lh-mobile-film-toggle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; display: grid; place-items: center; border: 1px solid #fff; border-radius: 50%; background: #ffffffdf; color: #233448; cursor: pointer; }
+  .lh-mobile-film-toggle[data-playing=true] { top: auto; left: auto; bottom: 12px; right: 12px; transform: none; width: 44px; height: 44px; }
+  .lh-mobile-film-copy { padding: 18px; }
+  .lh-mobile-film-copy h3 { margin: 0 0 8px; font-size: 20px; line-height: 1.4; color: #233448; }
+  .lh-mobile-film-copy p { margin: 0; font-size: 16px; line-height: 1.65; color: #68758a; }
+  .lh-mobile-films-controls { display: flex; align-items: center; justify-content: center; gap: 28px; margin-top: 8px; }
+  .lh-mobile-films-controls button { display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid #fff; border-radius: 50%; background: #ffffffb8; color: #233448; cursor: pointer; }
+  .lh-mobile-films-controls span { font-size: 16px; color: #68758a; font-variant-numeric: tabular-nums; }
+  .lh-mobile-films-controls strong { font-size: 20px; color: #233448; }
+  .lh-mobile-films :is(button, a):focus-visible { outline: 2px solid #65758d; outline-offset: 3px; }
+
+  .lumiq-root .prod-page .prod-feats-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;
+    width: calc(100% - 40px); margin-inline: auto; padding-inline: 0;
+  }
+  .lumiq-root .prod-page .prod-feat { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; min-height: 156px; border-radius: 20px; box-shadow: 0 8px 20px #2b36560b; }
+  .lumiq-root .prod-page .prod-feat > span:last-child { min-width: 0; max-width: 100%; }
+  .lumiq-root .prod-page .prod-feat strong { font-size: 18px !important; line-height: 1.4; }
+  .lumiq-root .prod-page .prod-feat small { font-size: 16px !important; line-height: 1.6; margin-top: 6px; }
+  .lumiq-root .prod-page .prod-tabs { display: none; }
+  .lumiq-root .prod-page .prod-slide[data-slot] { padding: 16px; border: 1px solid #fff; background: linear-gradient(135deg, #ffffffc9, #e8edfa8c); box-shadow: 0 12px 32px #2334480b; }
+}
+
+@media (max-width: 359px) {
+  .lumiq-root .prod-page .prod-feats-grid { grid-template-columns: 1fr; }
+  .lumiq-root .prod-page .prod-feat { flex-direction: row; align-items: center; min-height: 96px; }
+}
+
+/* Keep the single-card layout compact, with a single centered control row below the card. */
+@media (max-width: 960px) {
+  .lumiq-root .prod-page .prod-carousel-shell {
+    display: block; margin-inline: auto;
+    width: min(100%, 448px);
+  }
+  .lumiq-root .prod-page .prod-carousel {
+    width: 100%; margin-inline: auto;
+  }
+  .lumiq-root .prod-page .prod-slide[data-slot] { padding: 14px; border-radius: 24px; }
+  .lumiq-root .prod-page .prod-slide .prod-stage-media { height: clamp(160px, 43vw, 220px); aspect-ratio: auto; }
+  .lumiq-root .prod-page .prod-slide .prod-stage-media img { padding: 8px; }
+  .lumiq-root .prod-page .prod-slide .prod-stage-panel { padding: 10px 0 2px; }
+  .lumiq-root .prod-page .prod-index { font-size: 32px; line-height: 1; }
+  .lumiq-root .prod-page .prod-panel-body p { margin-block: 0 12px; }
+  .lumiq-root .prod-page .prod-specs { padding-bottom: 12px; }
+  .lumiq-root .prod-page .prod-specs li { padding-block: 4px; }
+
+}
+
+
+/* A single static frost layer keeps the phone card light while restoring depth. */
+@media (max-width: 767px) {
+  .lumiq-root .prod-page .prod-slide[data-slot] {
+    border-color: rgba(255,255,255,.86);
+    background: linear-gradient(145deg, rgba(252,254,255,.85), rgba(224,232,244,.76) 52%, rgba(249,251,255,.88));
+    box-shadow: inset 0 1px 1px #fff, inset 0 -1px 2px #9aaac42b, 0 12px 26px #23344818;
+  }
+  .lumiq-root .prod-page .prod-slide[data-slot]::before {
+    content: ''; position: absolute; inset: 0; z-index: 0; border-radius: inherit; pointer-events: none;
+    background: radial-gradient(ellipse at 0 0, #ffffff8c, transparent 48%), radial-gradient(ellipse at 100% 100%, #b6c7df24, transparent 55%);
+    box-shadow: inset 4px 4px 10px #ffffffb8, inset -4px -5px 12px #758aa52b;
+  }
+  .lumiq-root .prod-page .prod-slide[data-slot]::after {
+    content: ''; position: absolute; inset: 3px; z-index: 0;
+    border: 1px solid #ffffff52; border-radius: 20px; pointer-events: none;
+  }
+  @supports ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
+    .lumiq-root .prod-page .prod-slide[data-slot] {
+      background: linear-gradient(145deg, rgba(252,254,255,.62), rgba(218,229,243,.38) 52%, rgba(249,251,255,.58));
+      -webkit-backdrop-filter: blur(12px) saturate(120%);
+      backdrop-filter: blur(12px) saturate(120%);
+    }
+  }
+}

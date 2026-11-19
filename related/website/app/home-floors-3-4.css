@@ -1,6 +1,6 @@
 /* Third floor: quiet pearl glass, original product renders and circular navigation. */
 .lh-home .lh-products {
-  background: #f5f3f9 url('/assets/home-interactive/pearl-light.webp') center / cover no-repeat;
+  background: #f5f3f9 var(--cms-asset_b0fc987be9c43a11, url('/assets/home-interactive/pearl-light.webp')) center / cover no-repeat;
 }
 .lh-products .lh-products-stage { min-height: 100svh; padding: 110px 0 36px; gap: 24px; }
 .lh-products .lh-products-heading { justify-content: center; text-align: center; }
@@ -111,7 +111,7 @@
 }
 
 .lh-home .lh-room-section { padding: 0; background: #f0edf5; isolation: isolate; }
-.lh-room-layout { position: relative; isolation: isolate; max-width: 1920px; min-height: max(780px, min(56.25vw,1080px)); margin: auto; display: grid; grid-template-columns: 28% 1fr; align-items: center; padding: 80px 5%; }
+.lh-room-layout { position: relative; isolation: isolate; overflow: clip; max-width: 1920px; min-height: max(780px, min(56.25vw,1080px)); margin: auto; display: grid; grid-template-columns: 28% 1fr; align-items: center; padding: 80px 5%; }
 .lh-room-heading { position: relative; z-index: 2; grid-column: 1; padding-bottom: 10px; }
 .lh-home .lh-room-heading h2 { font-size: clamp(32px,2.8vw,54px); line-height: 1.12; letter-spacing: -.025em; text-transform: uppercase; color: #192434; }
 .lh-home .lh-room-intro { margin: 28px 0 0; max-width: 26ch; font-size: clamp(14px,1.05vw,19px); line-height: 1.7; color: #5c6878; }
@@ -133,7 +133,8 @@
 .lh-room-label > span { display: block; font-size: clamp(11px,.9vw,17px); text-transform: uppercase; font-weight: 500; letter-spacing: .01em; }
 .lh-room-label small { display: block; font-size: clamp(10px,.8vw,15px); margin-top: 4px; color: #637186; }
 .lh-room-mobile-links { display: none; }
-.lh-room-layout[data-reading=true] { min-height: var(--room-height); height: var(--room-height); }
+.lh-home .lh-room-section[data-room-sticky=true] { height: var(--room-stage-height); }
+.lh-room-layout[data-reading=true] { position: sticky; top: var(--room-top); min-height: var(--room-height); height: var(--room-height); }
 .lh-room-layout[data-reading=true] .lh-room-canvas {
   width: min(100%,calc((var(--room-height) - 48px)*16/9));
   height: min(1080px,56.25vw,calc(var(--room-height) - 48px));
@@ -141,13 +142,13 @@
   top: calc((var(--room-height) - min(1080px,56.25vw,calc(var(--room-height) - 48px)))/2);
 }
 .lh-room-layout[data-reading=true] .lh-room-background {
-  mask-image: linear-gradient(transparent,#000 8%,#000 92%,transparent),linear-gradient(90deg,transparent,#000 12%);
+  mask-image: linear-gradient(transparent,#000 8%,#000 92%,transparent),linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
   mask-composite: intersect;
 }
 @media (min-width:1921px) {
   .lh-room-background { mask-image: linear-gradient(transparent,#000 8%,#000 92%,transparent),linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent); mask-composite: intersect; }
 }
-@media (max-width:1100px) {
+@media (max-width:1199px) {
   .lh-room-layout { display: flex; flex-direction: column; min-height: 0; padding: 75px 0 48px; }
   .lh-room-heading { width: min(680px,calc(100% - var(--lh-gutter)*2)); margin: auto; padding-bottom: 25px; }
   .lh-home .lh-room-heading h2 { font-size: clamp(32px,4.5vw,46px); }
@@ -192,7 +193,7 @@
 }
 
 /* Shared volumetric material; existing rail remains the mobile/WebGL fallback. */
-.lh-glass-products { display: none; }
+.lh-glass-products,
 .lh-products[data-glass-3d] .lh-products-viewport { display: none; }
 .lh-products[data-glass-3d] .lh-glass-products { display: block; position: relative; height: clamp(560px, 76svh, 1000px); width: 100%; }
 .lh-products[data-glass-3d] .lh-glass-products::after { content: ""; position: absolute; inset: auto 0 0; height: 20%; pointer-events: none; background: linear-gradient(transparent, #f5f3f9); }

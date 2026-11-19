@@ -3,7 +3,7 @@
   --lq-section-gap: 128px;
   --lq-section-edge: calc(var(--lq-section-gap) / 2);
 }
-@media (max-width: 1100px) { .lumiq-root { --lq-section-gap: 96px; } }
+@media (max-width: 1199px) { .lumiq-root { --lq-section-gap: 96px; } }
 @media (max-width: 767px) { .lumiq-root { --lq-section-gap: 64px; } }
 
 .lumiq-root .lh-home :is(.lh-films-section, .lh-safety, .lh-family, .lh-join),
@@ -23,5 +23,5 @@
 }
 /* Arrow position follows the rendered carousel, never the space after it. */
 .lumiq-root .lh-home .lh-products[data-glass-3d] .lh-products-footer {
-  top: calc(100% - 12px - var(--carousel-height) * .47);
+  top: calc(100% - var(--lq-section-edge) - var(--carousel-height) * .61);
 }

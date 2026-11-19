@@ -1,18 +1,24 @@
 "use client";
+import {useContentAdapter} from "@/components/content/useContentAdapter";
+import Heading from "@/components/Heading";
+
 import { useMemo, useRef, useState } from "react";
 import Script from "next/script";
 import { Search, X } from "lucide-react";
 import {useTranslations} from "next-intl";
 
 export default function FaqPage() {
+  const cms = useContentAdapter();
   const t = useTranslations("Faq");
+  const faq = useTranslations("BrandFaq");
+  const storyFaq = useTranslations("BrandStoryFaq");
   const [open, setOpen] = useState<number | null>(0);
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
-  const faqs = useMemo(() => [1, 2, 3, 4, 5, 6].map((i) => ({
-    q: t(`q${i}`),
-    a: t(`a${i}`),
-  })), [t]);
+  const faqs = useMemo(() => Array.from({length:17},(_,index)=>index+1).map((i) => ({
+    q: faq(`q${i}`),
+    a: faq(`a${i}`),
+  })).concat({q: storyFaq("question"), a: storyFaq("answer")}), [faq, storyFaq]);
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -39,11 +45,11 @@ export default function FaqPage() {
 
       <section className="container" style={{ padding: "2rem 2rem 3rem" }}>
         <span className="kicker">{t("eyebrow")}</span>
-        <h1 className="serif" style={{ margin: "1rem 0 1.5rem", maxWidth: 700 }}>
+        <Heading as="h1" className="serif" style={{ margin: "1rem 0 1.5rem", maxWidth: 700 }}>
           {t("title")}
-        </h1>
+        </Heading>
         <p style={{ fontSize: "1.15rem", color: "var(--ink-2)", lineHeight: 1.7, maxWidth: 640 }}>
-          {t("introBefore")} <a href="mailto:hello@lumiqstudio.com" className="faq-mail">hello@lumiqstudio.com</a> {t("introAfter")}
+          {t("introBefore")} <a href={"mailto:" + cms.value("messages.{locale}.CmsStatic.field_23cd241d015790f4")} className="faq-mail">{cms.value("messages.{locale}.CmsStatic.field_23cd241d015790f4")}</a> {t("introAfter")}
         </p>
       </section>
 
@@ -75,7 +81,7 @@ export default function FaqPage() {
             <div key={f.q} className="faq-row">
               <button className="faq-q" id={`faq-question-${idx}`} onClick={() => setOpen(isOpen ? null : idx)} aria-expanded={isOpen} aria-controls={`faq-answer-${idx}`}>
                 <span>{f.q}</span>
-                <span className={`faq-plus${isOpen ? " open" : ""}`} aria-hidden>+</span>
+                <span className={`faq-plus${isOpen ? " open" : ""}`} aria-hidden>{cms.text("field_746d580ff27ae9e6")}</span>
               </button>
               <div id={`faq-answer-${idx}`} role="region" aria-labelledby={`faq-question-${idx}`} aria-hidden={!isOpen} className={`faq-a${isOpen ? " open" : ""}`}>
                 <p>{f.a}</p>

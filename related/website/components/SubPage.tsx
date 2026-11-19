@@ -1,3 +1,4 @@
+import Heading from "@/components/Heading";
 import type { ReactNode } from "react";
 
 interface SubPageProps {
@@ -14,7 +15,7 @@ export default function SubPage({ className, eyebrow, title, intro, children }: 
       <section className="subpage-hero">
         <div className="container">
           {eyebrow && <div className="eyebrow">{eyebrow}</div>}
-          <h1 className="serif subpage-title">{title}</h1>
+          <Heading as="h1" className="serif subpage-title">{title}</Heading>
           {intro && <p className="subpage-intro">{intro}</p>}
         </div>
       </section>
